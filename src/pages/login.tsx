@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import logo from "../assets/macky.png"; // Import logo
 
-
 const Login: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -31,16 +30,15 @@ const Login: React.FC = () => {
     }
   };
 
-  
-
   const inputWidth = "w-[32rem]"; // Set input width
 
   return (
-    <div className="flex flex-wrap min-h-screen w-full content-center justify-center bg-gray-200 py-10">
+    <div className="flex min-h-screen items-center justify-center bg-gray-200 py-10">
       <div className="flex shadow-md rounded-lg overflow-hidden">
+        {/* Login Form Container */}
         <div
           className="flex flex-wrap content-center justify-center bg-white"
-          style={{ width: "42rem", height: "40rem" }} // Wider container
+          style={{ width: "30rem", height: "40rem" }} // Adjust form width
         >
           <div className="w-full flex flex-col items-center">
             <h1 className="text-3xl font-semibold mb-1">Welcome back</h1>
@@ -48,7 +46,7 @@ const Login: React.FC = () => {
 
             <form className="w-full flex flex-col items-center" onSubmit={handleLogin}>
               {/* Username */}
-              <div className="mb-4 w-1/2 flex flex-col">
+              <div className="mb-4 w-3/4 flex flex-col">
                 <label className="mb-2 text-base font-semibold text-left pl-2">
                   Username
                 </label>
@@ -63,7 +61,7 @@ const Login: React.FC = () => {
               </div>
 
               {/* Password */}
-              <div className="mb-4 w-1/2 flex flex-col">
+              <div className="mb-4 w-3/4 flex flex-col">
                 <label className="mb-2 text-base font-semibold text-left pl-2">
                   Password
                 </label>
@@ -93,7 +91,7 @@ const Login: React.FC = () => {
         {/* Image Banner */}
         <div
           className="flex flex-wrap content-center justify-center bg-blue-100"
-          style={{ width: "36rem", height: "40rem" }}
+          style={{ width: "36rem", height: "40rem" }} // Adjust image width
         >
           <img
             className="max-w-[8rem] max-h-[8rem] object-contain" // Even smaller logo
