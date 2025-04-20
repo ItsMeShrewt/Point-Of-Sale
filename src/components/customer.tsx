@@ -14,6 +14,7 @@ const Customer: React.FC = () => {
     ['Robert Lee', 'March 20, 2025', 'Cement', '₱3,850.00', 'Cash', 'Delivery'],
     ['Emily Clark', 'March 21, 2025', 'Hollow Blocks', '₱1,500.00', 'COD', 'Pick-up'],
     ['David Kim', 'March 22, 2025', 'Steel Bars', '₱4,800.00', 'Cash', 'Delivery'],
+    ['David Kim', 'March 22, 2025', 'Steel Bars', '₱4,800.00', 'Cash', 'Delivery'],
   ];
 
   useEffect(() => {
