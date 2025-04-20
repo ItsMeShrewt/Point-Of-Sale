@@ -1,6 +1,11 @@
 @charset "UTF-8";
 @import "https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap";
 
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
 /* src/assets/icon-fonts/RemixIcons/fonts/remixicon.css */
 @font-face {
   font-family: "remixicon";
@@ -15,7 +20,7 @@
 }
 [class^=ri-],
 [class*=" ri-"] {
-  font-family: "remixicon" !important;
+  font-family: "remixicon", sans-serif !important;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

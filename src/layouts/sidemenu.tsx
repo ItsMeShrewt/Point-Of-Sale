@@ -86,10 +86,10 @@ function Sidemenu() {
               </li>
 
               {/* Sales Orders */}
-              <li className={`slide ${isActive('/product-sales') ? 'bg-red-700' : ''}`}>
-                <Link to="/product-sales" className="side-menu__item">
+              <li className={`slide ${isActive('/order') ? 'bg-red-700' : ''}`}>
+                <Link to="/order" className="side-menu__item">
                   <i className="w-6 h-4 side-menu__icon bi bi-cart-check" style={{ color: 'white' }}></i>
-                  <span className="side-menu__label" style={{ color: 'white' }}>Sales Orders</span>
+                  <span className="side-menu__label" style={{ color: 'white' }}>Order Management</span>
                 </Link>
               </li>
 
@@ -161,12 +161,6 @@ function Sidemenu() {
                 <Link to="/reports" className="side-menu__item">
                   <i className="w-6 h-4 side-menu__icon bi bi-clipboard-data" style={{ color: 'white' }}></i>
                   <span className="side-menu__label" style={{ color: 'white' }}>Reports</span>
-                </Link>
-              </li>
-              <li className={`slide ${isActive('/experiments') ? 'bg-red-700' : ''}`}>
-                <Link to="/experiments" className="side-menu__item">
-                  <i className="w-6 h-4 side-menu__icon bi bi-clipboard-data" style={{ color: 'white' }}></i>
-                  <span className="side-menu__label" style={{ color: 'white' }}>Experiments</span>
                 </Link>
               </li>
             </ul>

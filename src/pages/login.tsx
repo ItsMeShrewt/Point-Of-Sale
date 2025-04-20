@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import logo from "../assets/macky.png";
+import logo from "../assets/macky.png"; // Import logo
+
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState<string>("");
@@ -15,7 +16,7 @@ const Login: React.FC = () => {
       localStorage.setItem("isAuthenticated", "true");
       Swal.fire({
         icon: "success",
-        html: `<h2 class="text-2xl font-bold">Admin Login Successful!</h2>`,
+        html: '<h2 class="text-2xl font-bold">Admin Login Successful!</h2>',
         showConfirmButton: false,
         timer: 1500,
       }).then(() => {
@@ -30,55 +31,76 @@ const Login: React.FC = () => {
     }
   };
 
+  
+
+  const inputWidth = "w-[32rem]"; // Set input width
+
   return (
-    <div className="flex items-center justify-end min-h-screen bg-red-300" style={{ padding: '150px'}}>
-      <div className="bg-blue-100 shadow-lg rounded-lg p-8 pr-20 w-full max-w-lg flex flex-col justify-center items-center text-center" style={{ height: '500px' }}>
+    <div className="flex flex-wrap min-h-screen w-full content-center justify-center bg-gray-200 py-10">
+      <div className="flex shadow-md rounded-lg overflow-hidden">
+        <div
+          className="flex flex-wrap content-center justify-center bg-white"
+          style={{ width: "42rem", height: "40rem" }} // Wider container
+        >
+          <div className="w-full flex flex-col items-center">
+            <h1 className="text-3xl font-semibold mb-1">Welcome back</h1>
+            <small className="text-gray-400 text-base mb-6">Please enter your details</small>
 
-        
-        <img
-          src={logo}
-          alt="Clinic Logo"
-          className="h-24 w-24 object-contain mb-4"
-        />
-        <h2 className="text-3xl font-bold text-gray-800">
-          Welcome Back
-        </h2>
-        <p className="text-lg font-semibold mb-6 text-gray-800">
-          Please enter the details to login
-        </p>
+            <form className="w-full flex flex-col items-center" onSubmit={handleLogin}>
+              {/* Username */}
+              <div className="mb-4 w-1/2 flex flex-col">
+                <label className="mb-2 text-base font-semibold text-left pl-2">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className={`rounded-md border border-gray-800 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-2 px-3 text-gray-700 ${inputWidth}`}
+                  required
+                />
+              </div>
 
-        <form onSubmit={handleLogin} className="space-y-5 w-full max-w-md flex flex-col items-center">
-          
-          <div className="flex flex-col w-full text-left">
-            <input
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:border-gray-500 focus:ring-0"
-              required
-            />
+              {/* Password */}
+              <div className="mb-4 w-1/2 flex flex-col">
+                <label className="mb-2 text-base font-semibold text-left pl-2">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  placeholder="*****"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={`rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-2 px-3 text-gray-700 ${inputWidth}`}
+                  required
+                />
+              </div>
+
+              {/* Sign In Button */}
+              <div className="mb-3 w-full flex justify-center">
+                <button
+                  type="submit"
+                  className="text-white w-1/4 bg-purple-700 hover:bg-purple-900 px-2 py-2 rounded-md"
+                >
+                  Sign in
+                </button>
+              </div>
+            </form>
           </div>
+        </div>
 
-          <div className="flex flex-col w-full text-left">
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="p-3 w-full border border-gray-300 rounded-md focus:outline-none focus:border-gray-500 focus:ring-0"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-48 h-12 bg-blue-500 text-white font-medium text-lg rounded-md hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-400"
-          >
-            Login
-          </button>
-          
-        </form>
+        {/* Image Banner */}
+        <div
+          className="flex flex-wrap content-center justify-center bg-blue-100"
+          style={{ width: "36rem", height: "40rem" }}
+        >
+          <img
+            className="max-w-[8rem] max-h-[8rem] object-contain" // Even smaller logo
+            src={logo}
+            alt="Login Banner"
+          />
+        </div>
       </div>
     </div>
   );

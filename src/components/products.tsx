@@ -1,8 +1,9 @@
 // src/components/ProductTable.tsx
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Grid } from "gridjs";
 import "gridjs/dist/theme/mermaid.css";
 import { html } from "gridjs";
+import CategoryButtons from "./category"; // Import the CategoryButtons component
 
 interface ProductTableProps {
   setOrders: React.Dispatch<
@@ -19,6 +20,11 @@ interface ProductTableProps {
 
 const ProductTable: React.FC<ProductTableProps> = ({ setOrders }) => {
   const gridRef = useRef<HTMLDivElement | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+
+  const handleCategoryChange = (category: string) => {
+    setSelectedCategory(category);
+  };
 
   useEffect(() => {
     if (gridRef.current) {
@@ -51,7 +57,9 @@ const ProductTable: React.FC<ProductTableProps> = ({ setOrders }) => {
 
               const isDisabled = !productQuantity || Number(productQuantity) <= 0;
               const disabledAttr = isDisabled ? "disabled" : "";
-              const disabledClass = isDisabled ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500 hover:bg-blue-600";
+              const disabledClass = isDisabled
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600";
 
               return html(`
                 <button
@@ -82,7 +90,12 @@ const ProductTable: React.FC<ProductTableProps> = ({ setOrders }) => {
           ["Steel Wire", "KEI Industries Ltd", "Per kg", "kg", 90, 0],
           ["Sand", "Holcim", "Per Cubic", "Cubic", 800, 0],
           ["Gravel", "CEMEX", "Per Cubic", "Cubic", 1100, 4],
-        ].map((row, index) => [(index + 1) + ".", ...row]),
+        ]
+          .map((row, index) => [(index + 1) + ".", ...row])
+          .filter((row) => {
+            if (!selectedCategory) return true; // If no category is selected, show all
+            return row[1] === selectedCategory; // Filter based on selected category
+          }),
       });
 
       grid.render(gridRef.current);
@@ -130,9 +143,20 @@ const ProductTable: React.FC<ProductTableProps> = ({ setOrders }) => {
         container.removeEventListener("click", handleClick);
       };
     }
-  }, [setOrders]);
+  }, [setOrders, selectedCategory]); // Rerender when category is selected
 
-  return <div ref={gridRef} className="w-full overflow-auto" />;
+  return (
+    <div className="w-full overflow-auto">
+      {/* Grid Table */}
+      <div ref={gridRef} />
+
+      {/* Category Buttons Component */}
+      <CategoryButtons
+        selectedCategory={selectedCategory}
+        handleCategoryChange={handleCategoryChange}
+      />
+    </div>
+  );
 };
 
 export default ProductTable;
