@@ -119,57 +119,57 @@ const Order: React.FC = () => {
                   {/* Checkout Section */}
                   <div className="p-5 border-t bg-gray-50 flex flex-col items-stretch gap-3">
                     <div className="flex justify-between w-full items-center">
-                      <span className="font-medium text-sm text-gray-600">Subtotal:</span>
+                      <span className="font-medium text-lg text-gray-600">Subtotal:</span>
                       <input
                         type="text"
                         value={`₱${subtotal.toFixed(2)}`}
                         disabled
-                        className="px-2 py-1 border rounded-md w-32"
+                        className="px-2 py-1 border rounded-md w-52"
                       />
                     </div>
 
-                    <div className="flex justify-between w-full items-center">
-                      <span className="font-medium text-sm text-gray-600">Delivery Charges:</span>
+                    {/*<div className="flex justify-between w-full items-center">
+                      <span className="font-medium text-lg text-gray-600">Delivery Charges:</span>
                       <input
                         type="number"
                         value={isNaN(deliveryFee) ? "" : deliveryFee}
                         onChange={(e) =>
                           setDeliveryFee(e.target.value === "" ? NaN : parseFloat(e.target.value) || 0)
                         }
-                        className="px-2 py-1 border rounded-md w-32"
+                        className="px-2 py-1 border rounded-md w-52"
                       />
-                    </div>
+                    </div>*/}
 
                     <div className="flex justify-between w-full items-center">
-                      <span className="font-medium text-sm text-gray-600">Total Amount:</span>
+                      <span className="font-medium text-lg text-gray-600">Total Amount:</span>
                       <input
                         type="text"
                         value={`₱${totalAmount.toFixed(2)}`}
                         disabled
-                        className="px-2 py-1 border rounded-md w-32"
+                        className="px-2 py-1 border rounded-md w-52"
                       />
                     </div>
 
                     <div className="flex justify-between w-full items-center">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm text-gray-600">Enter Amount:</span>
+                        <span className="font-medium text-lg text-gray-600">Enter Amount:</span>
                         <input
                           type="number"
                           value={isNaN(amountGiven) ? "" : amountGiven}
                           onChange={(e) =>
                             setAmountGiven(e.target.value === "" ? NaN : parseFloat(e.target.value) || 0)
                           }
-                          className="px-2 py-1 border rounded-md w-32"
+                          className="px-2 py-1 border rounded-md w-52"
                         />
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm text-gray-600">Change:</span>
+                        <span className="font-medium text-lg text-gray-600">Change:</span>
                         <input
                           type="text"
                           value={`₱${change.toFixed(2)}`}
                           disabled
-                          className="px-2 py-1 border rounded-md w-32"
+                          className="px-2 py-1 border rounded-md w-52"
                         />
                       </div>
                     </div>
