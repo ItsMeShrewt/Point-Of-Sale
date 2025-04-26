@@ -39,10 +39,6 @@ const Product_List: React.FC = () => {
                         <i class="ri-pencil-line mr-1"></i>
                         <span class="px-1">Edit</span>
                       </button>
-                      <button class="bg-red-500 text-white px-2 py-1 rounded text-xs flex items-center">
-                        <i class="ri-delete-bin-line mr-1"></i>
-                        <span class="px-1">Delete</span>
-                      </button>
                   `)
           },
         ],

@@ -1,6 +1,6 @@
 import {
   Users,
-  DollarSign,
+  PhilippinePeso,
   ShoppingCart,
   Package,
 } from "lucide-react";
@@ -16,9 +16,9 @@ function DashboardStats() {
     },
     {
       label: "Total Sales",
-      value: "$227.28",
+      value: "227.28",
       isPositive: true,
-      icon: DollarSign,
+      icon: PhilippinePeso,
       color: "bg-green-100 text-green-600",
     },
     {

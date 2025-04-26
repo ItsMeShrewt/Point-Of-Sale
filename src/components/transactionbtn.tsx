@@ -6,12 +6,14 @@ interface TransactionButtonsProps {
   onProcess: () => void;
   onCancel: () => void;
   hasOrder: boolean;
+  canProcess: boolean; // ✅ added
 }
 
 const TransactionButtons: React.FC<TransactionButtonsProps> = ({
   onProcess,
   onCancel,
   hasOrder,
+  canProcess, // ✅ added
 }) => {
   const [showModal, setShowModal] = useState(false);
   const disabledStyle = "opacity-50 cursor-not-allowed";
@@ -21,18 +23,22 @@ const TransactionButtons: React.FC<TransactionButtonsProps> = ({
       <div className="p-5 border-t bg-gray-50 flex justify-center space-x-4">
         {/* Process Button */}
         <button
-          className={`flex-1 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-lg ${
-            !hasOrder ? disabledStyle : ""
+          className={`flex-1 px-3 py-2 ${
+            canProcess ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400"
+          } text-white rounded-md transition text-lg ${
+            !canProcess ? disabledStyle : ""
           }`}
           onClick={() => setShowModal(true)}
-          disabled={!hasOrder}
+          disabled={!canProcess}
         >
           Process
         </button>
 
         {/* Cancel Button */}
         <button
-          className={`flex-1 px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition text-lg ${
+          className={`flex-1 px-3 py-2 ${
+            hasOrder ? "bg-red-500 hover:bg-red-600" : "bg-gray-400"
+          } text-white rounded-md transition text-lg ${
             !hasOrder ? disabledStyle : ""
           }`}
           onClick={() => showCancelAlert(onCancel)}

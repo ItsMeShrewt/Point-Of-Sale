@@ -26,7 +26,7 @@ const Customer: React.FC = () => {
             width: "80px",
             formatter: (_, row) => html(`<span>${row.cells[1].data}</span>`),
           },
-          { name: "Date & Time", width: "100px" },
+          { name: "Date", width: "100px" },
           { name: "Product Name", width: "150px" },
           { name: "Total Amount", width: "100px" },
           { name: "Payment Method", width: "100px" },
