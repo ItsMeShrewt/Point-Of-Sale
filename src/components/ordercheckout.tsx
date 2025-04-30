@@ -145,6 +145,7 @@ const OrderListAndCheckout: React.FC<Props> = ({
                       : parseFloat(e.target.value) || 0
                   )
                 }
+                disabled={orders.length === 0}
                 className="px-2 py-1 border rounded-md w-32"
               />
             </div>
