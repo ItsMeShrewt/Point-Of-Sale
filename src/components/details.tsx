@@ -18,7 +18,7 @@ const Details: React.FC<DetailsProps> = ({ onClose, onProcess }) => {
     (type === "Delivery" ? address.trim() !== "" && fee.trim() !== "" : true);
 
   const handleProceed = () => {
-    onClose();
+    if (!isFormValid) return;
 
     Swal.fire({
       icon: "success",
@@ -31,8 +31,9 @@ const Details: React.FC<DetailsProps> = ({ onClose, onProcess }) => {
     });
 
     onProcess();
+    onClose();
 
-    // Reset
+    // Reset form
     setName("");
     setAddress("");
     setFee("");
@@ -56,6 +57,7 @@ const Details: React.FC<DetailsProps> = ({ onClose, onProcess }) => {
           className="w-full border p-2 rounded"
           value={type}
           onChange={(e) => setType(e.target.value)}
+          disabled={name.trim() === ""} // 🔒 Disable until name is entered
         >
           <option value="">-- Select Type --</option>
           <option value="Pick-up">Pick-up</option>
