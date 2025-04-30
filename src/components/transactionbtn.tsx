@@ -6,14 +6,14 @@ interface TransactionButtonsProps {
   onProcess: () => void;
   onCancel: () => void;
   hasOrder: boolean;
-  canProcess: boolean; // ✅ added
+  canProcess: boolean;
 }
 
 const TransactionButtons: React.FC<TransactionButtonsProps> = ({
   onProcess,
   onCancel,
   hasOrder,
-  canProcess, // ✅ added
+  canProcess,
 }) => {
   const [showModal, setShowModal] = useState(false);
   const disabledStyle = "opacity-50 cursor-not-allowed";
