@@ -42,35 +42,39 @@ const Orders: React.FC = () => {
               const productName = row.cells[2].data;
               const productDescription = row.cells[3].data;
               const productPrice = row.cells[5].data;
-
+              const productQuantity = row.cells[6].data;
+          
+              const isDisabled = productQuantity === 0;
+          
               return html(`
                 <button
-                  class="add-to-order bg-blue-500 text-white px-2 py-3 rounded-md text-s flex items-center"
+                  class="add-to-order bg-blue-500 text-white px-2 py-3 rounded-md text-s flex items-center ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}"
                   data-name="${productName}"
                   data-description="${productDescription}"
                   data-price="${productPrice}"
+                  ${isDisabled ? 'disabled' : ''}
                 >
                   <i class="ri-add-line mr-1"></i>
                   <span class="px-1">Add to Order</span>
                 </button>
               `);
             },
-          },
+          }          
         ],
         pagination: { limit: 7 },
         search: true,
         sort: true,
         data: [
-          ["Plywood", "Marine", "¼ inch", "pc", 450, 0],
+          ["Plywood", "Marine", "¼ inch", "pc", 450, 5],
           ["Plywood", "Marine", "½ inch", "pc", 780, 0],
-          ["Plywood", "Ordinary", "½ inch", "pc", 580, 0],
-          ["Plywood", "China", "¾ inch", "pc", 980, 0],
+          ["Plywood", "Ordinary", "½ inch", "pc", 580, 5],
+          ["Plywood", "China", "¾ inch", "pc", 980, 5],
           ["Plywood", "Top Forest", "¾ inch", "pc", 1250, 0],
-          ["Rebar", "Nippon Steel", "8 inch", "pc", 100, 0],
-          ["Mild Steel Square Hollow Bar", "BM Steel", "1x1", "pc", 400, 0],
+          ["Rebar", "Nippon Steel", "8 inch", "pc", 100, 6],
+          ["Mild Steel Square Hollow Bar", "BM Steel", "1x1", "pc", 400, 4],
           ["Steel Wire", "KEI Industries Ltd", "Per kg", "kg", 90, 0],
           ["Sand", "Holcim", "Per Cubic", "Cubic", 800, 0],
-          ["Gravel", "CEMEX", "Per Cubic", "Cubic", 1100, 0],
+          ["Gravel", "CEMEX", "Per Cubic", "Cubic", 1100, 5],
           ["Sealant", "Bostik", "Vulca Seal", "1L", 750, 20],
           ["Sealant", "Wilcon", "Sure Seal", "50ml", 180, 11],
           ["Adhesive", "Stikwel", "PVA Wood Glue", "250g", 260, 11],
@@ -154,15 +158,15 @@ const Orders: React.FC = () => {
                     <span><b>Orders</b></span>
                   </h5>
                   <hr className="mt-3 mb-0" />
-                  <div className="flex flex-col gap-3 overflow-y-auto pr-2" style={{ maxHeight: "400px" }}>
+                  <div className="flex flex-col gap-3 overflow-y-auto pr-2" style={{ maxHeight: "450px" }}>
                   {orders.map((order, index) => (
                     <div
                       key={index}
                       className="flex justify-between bg-white shadow-md border border-gray-200 p-3 rounded-lg hover:shadow-lg transition-all duration-200"
                     >
                       <div className="flex flex-col">
-                        <p className="text-base font-medium text-gray-900">{order.name}</p>
-                        <p className="text-sm text-gray-600">{order.description}</p>  {/* added description display */}
+                        <p className="text-xl font-medium text-gray-900">{order.name}</p>
+                        <p className="text-base font-semibold text-gray-600">{order.description}</p>  {/* added description display */}
                         <QuantityButton />
                       </div>
                       <div className="flex flex-col items-end gap-2">

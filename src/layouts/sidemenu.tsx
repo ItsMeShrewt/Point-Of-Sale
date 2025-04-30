@@ -86,12 +86,6 @@ function Sidemenu() {
               </li>
 
               {/* Sales Orders */}
-              <li className={`slide ${isActive('/order') ? 'bg-red-700' : ''}`}>
-                <Link to="/order" className="side-menu__item">
-                  <i className="w-6 h-4 side-menu__icon bi bi-cart-check" style={{ color: 'white' }}></i>
-                  <span className="side-menu__label" style={{ color: 'white' }}>Order Management</span>
-                </Link>
-              </li>
               <li className={`slide ${isActive('/orders') ? 'bg-red-700' : ''}`}> 
                 <Link to="/orders" className="side-menu__item"> 
                   <i className="w-6 h-4 side-menu__icon bi bi-cart-check" style={{ color: 'white' }}></i>

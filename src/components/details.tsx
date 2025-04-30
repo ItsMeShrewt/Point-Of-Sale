@@ -9,9 +9,13 @@ interface DetailsProps {
 const Details: React.FC<DetailsProps> = ({ onClose, onProcess }) => {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
-  const [type, setType] = useState(""); // Start with empty string
+  const [fee, setFee] = useState("");
+  const [type, setType] = useState("");
 
-  const isFormValid = name.trim() !== "" && address.trim() !== "" && type !== "";
+  const isFormValid =
+    name.trim() !== "" &&
+    type !== "" &&
+    (type === "Delivery" ? address.trim() !== "" && fee.trim() !== "" : true);
 
   const handleProceed = () => {
     onClose();
@@ -21,16 +25,17 @@ const Details: React.FC<DetailsProps> = ({ onClose, onProcess }) => {
       title: "Transaction Processed",
       html: `
         <strong>Name:</strong> ${name}<br/>
-        <strong>Address:</strong> ${address}<br/>
+        ${type === "Delivery" ? `<strong>Address:</strong> ${address}<br/><strong>Delivery Fee:</strong> ₱${fee}<br/>` : ""}
         <strong>Type:</strong> ${type}
       `,
     });
 
     onProcess();
 
-    // Optional: Reset fields (if needed)
+    // Reset
     setName("");
     setAddress("");
+    setFee("");
     setType("");
   };
 
@@ -47,14 +52,6 @@ const Details: React.FC<DetailsProps> = ({ onClose, onProcess }) => {
           onChange={(e) => setName(e.target.value)}
         />
 
-        <input
-          type="text"
-          placeholder="Address"
-          className="w-full border p-2 rounded"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-        />
-
         <select
           className="w-full border p-2 rounded"
           value={type}
@@ -64,6 +61,26 @@ const Details: React.FC<DetailsProps> = ({ onClose, onProcess }) => {
           <option value="Pick-up">Pick-up</option>
           <option value="Delivery">Delivery</option>
         </select>
+
+        {type === "Delivery" && (
+          <>
+            <input
+              type="text"
+              placeholder="Address"
+              className="w-full border p-2 rounded"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            />
+            <input
+              type="number"
+              placeholder="Delivery Fee"
+              className="w-full border p-2 rounded"
+              value={fee}
+              onChange={(e) => setFee(e.target.value)}
+              min="0"
+            />
+          </>
+        )}
 
         <div className="flex justify-end gap-2 pt-2">
           <button
