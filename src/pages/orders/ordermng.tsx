@@ -4,7 +4,7 @@ import "gridjs/dist/theme/mermaid.css";
 import Breadcrumb from "../../components/breadcrums";
 import Header from "../../layouts/header";
 import Sidemenu from "../../layouts/sidemenu";
-import ItemButtons from "../../components/buttons.tsx";
+// import ItemButtons from "../../components/buttons.tsx";
 import { Link } from "react-router-dom";
 import OrderListAndCheckout from "../../components/ordercheckout.tsx";
 
@@ -66,25 +66,43 @@ const Orders: React.FC = () => {
 
     const grid = new Grid({
       columns: [
-        { name: "#", width: "55px" },
+        { name: "#", width: "50px",
+          formatter: (cell) =>
+            html(`<span class="text-base">${cell}</span>`),
+         },
         {
           name: "Category",
           width: "100px",
           formatter: (_, row) =>
             html(
               `<div class="flex items-center gap-3">
-                <span>${row.cells[1].data}</span>
+                <span class="text-base">${row.cells[1].data}</span>
               </div>`
             ),
         },
-        { name: "Brand", width: "125px" },
-        { name: "Description", width: "125px" },
-        { name: "Unit", width: "100px" },
-        { name: "Price", width: "100px" },
-        { name: "Quantity", width: "100px" },
+        { name: "Brand", width: "125px",
+          formatter: (cell) =>
+            html(`<span class="text-base">${cell}</span>`),
+         },
+        { name: "Description", width: "125px",
+          formatter: (cell) =>
+            html(`<span class="text-base">${cell}</span>`),
+         },
+        { name: "Unit", width: "70px",
+          formatter: (cell) =>
+            html(`<span class="text-base">${cell}</span>`),
+         },
+        { name: "Price", width: "70px",
+          formatter: (cell) =>
+            html(`<span class="text-base">${cell}</span>`),
+         },
+        { name: "Quantity", width: "100px",
+          formatter: (cell) =>
+            html(`<span class="text-base">${cell}</span>`),
+         },
         {
           name: "Action",
-          width: "150px",
+          width: "110px",
           formatter: (_, row) => {
             const productName = row.cells[2].data;
             const productDescription = row.cells[3].data;
@@ -108,6 +126,9 @@ const Orders: React.FC = () => {
           },
         },
       ],
+      className: {
+        th: "text-lg font-semibold",
+      },
       pagination: { limit: 7 },
       search: true,
       sort: true,
@@ -170,8 +191,10 @@ const Orders: React.FC = () => {
             <div className="xxl:col-span-8 col-span-12">
               <div className="box overflow-hidden main-content-card">
                 <div className="box-body p-5">
-                  <ItemButtons />
-                  <hr className="mt-3 mb-4" />
+                  {/*
+                    <ItemButtons />
+                    <hr className="mt-3 mb-4" />
+                  */}
                   <div ref={gridRef}></div>
                 </div>
               </div>

@@ -8,6 +8,9 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui'],
+      fontSize: {
+        'lg-plus': '19px',
+        },
       },
     },
   },

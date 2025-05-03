@@ -41,10 +41,10 @@ const OrderListAndCheckout: React.FC<Props> = ({
         style={{ height: "815px" }}
       >
         <div className="box-body p-5">
-          <h5 className="mt-2 mb-0">
+          <h5 className="mt-0 mb-0">
             <b>Orders</b>
           </h5>
-          <hr className="mt-3 mb-0" />
+          <hr className="mt-2 mb-2" />
           <div
             className="flex flex-col gap-3 overflow-y-auto pr-2"
             style={{ maxHeight: "450px" }}
@@ -52,7 +52,7 @@ const OrderListAndCheckout: React.FC<Props> = ({
             {orders.map((order, index) => (
               <div
                 key={index}
-                className="flex justify-between bg-white shadow-md border border-gray-200 p-3 rounded-lg hover:shadow-lg transition-all duration-200"
+                className="flex justify-between bg-white shadow-md border border-gray-800 p-3 rounded-lg hover:shadow-lg transition-all duration-200"
               >
                 <div className="flex flex-col">
                   <p className="text-xl font-medium text-gray-900">
