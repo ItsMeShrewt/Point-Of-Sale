@@ -34,6 +34,11 @@ const OrderListAndCheckout: React.FC<Props> = ({
   const change = Math.max(amountGiven - totalAmount, 0);
   const canProcess = amountGiven >= totalAmount && totalAmount > 0;
 
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setAmountGiven(value === "" ? 0 : parseFloat(value));
+  };
+
   return (
     <div className="xxl:col-span-4 col-span-12">
       <div
@@ -107,7 +112,7 @@ const OrderListAndCheckout: React.FC<Props> = ({
 
         <div className="p-5 border-t bg-gray-50 flex flex-col items-stretch gap-3">
           <div className="flex justify-between w-full items-center">
-            <span className="font-medium text-sm text-gray-600">
+            <span className="font-medium text-lg text-gray-600">
               Subtotal:
             </span>
             <input
@@ -119,7 +124,7 @@ const OrderListAndCheckout: React.FC<Props> = ({
           </div>
 
           <div className="flex justify-between w-full items-center">
-            <span className="font-medium text-sm text-gray-600">
+            <span className="font-medium text-lg text-gray-600">
               Total Amount:
             </span>
             <input
@@ -132,26 +137,20 @@ const OrderListAndCheckout: React.FC<Props> = ({
 
           <div className="flex justify-between w-full items-center">
             <div className="flex items-center gap-2">
-              <span className="font-medium text-sm text-gray-600">
+              <span className="font-medium text-lg text-gray-600">
                 Enter Amount:
               </span>
               <input
                 type="number"
-                value={isNaN(amountGiven) ? "" : amountGiven}
-                onChange={(e) =>
-                  setAmountGiven(
-                    e.target.value === ""
-                      ? NaN
-                      : parseFloat(e.target.value) || 0
-                  )
-                }
+                value={amountGiven === 0 ? "" : amountGiven}
+                onChange={handleAmountChange}
                 disabled={orders.length === 0}
                 className="px-2 py-1 border rounded-md w-32"
               />
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="font-medium text-sm text-gray-600">
+              <span className="font-medium text-lg text-gray-600">
                 Change:
               </span>
               <input

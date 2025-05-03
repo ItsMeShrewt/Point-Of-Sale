@@ -57,9 +57,9 @@ const Inventory_List: React.FC = () => {
                       ${cell}
                     </span>
                   </div>
-                `);
+                  `);
+                },
               },
-            },
           { name: "Action", width: "100px", formatter: () => html(`
             <div class="flex justify-center gap-2">
               <button class="bg-yellow-500 text-white px-2 py-1 rounded-md text-xs flex items-center edit-button">

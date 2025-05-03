@@ -1,34 +1,68 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 interface EditModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialProductName?: string;
+  initialQuantity?: string;
 }
 
-const EditModal: React.FC<EditModalProps> = ({ isOpen, onClose }) => {
-  const [productName, setProductName] = useState("");
-  const [quantity, setQuantity] = useState("");
+const EditModal: React.FC<EditModalProps> = ({ isOpen, onClose, initialProductName = "", initialQuantity = "" }) => {
+  const [productName, setProductName] = useState(initialProductName);
+  const [quantity, setQuantity] = useState(initialQuantity);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const form = e.currentTarget;
     if (!form.checkValidity()) {
-      // Let the browser show the default tooltip
       form.reportValidity();
       return;
     }
 
-    // Proceed with your logic if valid
+    // ✅ Show success toast
+    toast.success("Material updated successfully!", {
+      position: "top-right",
+      autoClose: 3000,
+      style: { fontWeight: 600, fontSize: '17px' },
+    });
+
     console.log("Form submitted", { productName, quantity });
+
+    // Reset inputs after successful save
+    setProductName("");
+    setQuantity("");
+
+    onClose();
+  };
+
+  const handleCancel = () => {
+    // 🚫 Show cancel toast only if cancel button is clicked
+    toast.info("Edit canceled.", {
+      position: "top-right",
+      autoClose: 2500,
+      style: { fontWeight: 600, fontSize: '17px' },
+    });
+
+    // Reset inputs when canceled
+    setProductName("");
+    setQuantity("");
+
     onClose();
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-md shadow-lg w-full max-w-md">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+      onClick={() => onClose()} // Close the modal when clicking outside
+    >
+      <div
+        className="bg-white p-6 rounded-md shadow-lg w-full max-w-md"
+        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
+      >
         <h2 className="text-xl font-semibold mb-4">Edit Material</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -56,14 +90,14 @@ const EditModal: React.FC<EditModalProps> = ({ isOpen, onClose }) => {
           <div className="flex justify-end gap-2">
             <button
               type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-300 rounded"
+              onClick={handleCancel} // Show cancel toast only when clicking cancel
+              className="px-4 py-2 bg-gray-300 rounded-md"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md"
             >
               Save
             </button>

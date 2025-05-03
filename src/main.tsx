@@ -16,6 +16,8 @@ import Logout from './pages/logout.tsx';
 import Orders from './pages/orders/ordermng.tsx';
 import Product_List from './pages/product/product.tsx';
 import Reports from './pages/reports/reports.tsx';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 
 
@@ -36,6 +38,7 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/history" element={<Order_History />} />
         <Route path="/reports" element={<Reports />} />
       </Routes>
+      <ToastContainer position="top-center" autoClose={3000} />
     </BrowserRouter>
   </StrictMode>,
 )

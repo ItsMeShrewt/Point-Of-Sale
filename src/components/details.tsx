@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 
 interface DetailsProps {
   onClose: () => void;
@@ -20,43 +20,30 @@ const Details: React.FC<DetailsProps> = ({ onClose, onProcess }) => {
   const handleProceed = () => {
     if (!isFormValid) return;
 
-    Swal.fire({
-      icon: "success",
-      title: '<span style="font-size: 25px; font-weight: bold;">Transaction Processed</span>',
-      html: `
-        <div style="display: flex; justify-content: center;">
-          <table style="font-size: 15px; text-align: left;">
-            <tr>
-              <td style="padding: 4px 8px; font-weight: bold;">Name:</td>
-              <td style="padding: 4px 8px;">${name}</td>
-            </tr>
-            ${
-              type === "Delivery"
-                ? `
-                  <tr>
-                    <td style="padding: 4px 8px; font-weight: bold;">Address:</td>
-                    <td style="padding: 4px 8px;">${address}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 4px 8px; font-weight: bold;">Delivery Fee:</td>
-                    <td style="padding: 4px 8px;">₱${fee}</td>
-                  </tr>
-                `
-                : ""
-            }
-            <tr>
-              <td style="padding: 4px 8px; font-weight: bold;">Type:</td>
-              <td style="padding: 4px 8px;">${type}</td>
-            </tr>
-          </table>
+    // ✅ Toastify notification with semibold heading
+    toast.success(
+      <div>
+        <div className="text-base font-semibold mb-1">
+          Transaction processed successfully!
         </div>
-      `,
-      customClass: {
-        title: 'text-xl font-bold', // Tailwind utility classes if using Tailwind
-        popup: 'text-left',
+        <div className="text-base font-normal" style={{ paddingLeft: '1rem' }}>
+        <p>Name: {name}</p>
+        <p>Type: {type}</p>
+        {type === "Delivery" && (
+          <>
+            <p>Address: {address}</p>
+            <p>Delivery Fee: ₱{fee}</p>
+          </>
+        )}
+      </div>
+      </div>,
+      {
+        position: "top-right",
+        autoClose: 3500,
+        style: { fontWeight: 600, fontSize: '17px', width: "375px", whiteSpace: "normal" },
       }
-    });
-    
+    );    
+
     onProcess();
     onClose();
 
@@ -75,13 +62,13 @@ const Details: React.FC<DetailsProps> = ({ onClose, onProcess }) => {
         <input
           type="text"
           placeholder="Name"
-          className="w-full border p-3 rounded text-base font-medium"
+          className="w-full border p-3 rounded text-lg font-medium"
           value={name}
           onChange={(e) => setName(e.target.value)}
         />
 
         <select
-          className="w-full border p-3 rounded text-base font-medium"
+          className="w-full border p-3 rounded text-lg font-medium"
           value={type}
           onChange={(e) => setType(e.target.value)}
           disabled={name.trim() === ""}
@@ -96,14 +83,14 @@ const Details: React.FC<DetailsProps> = ({ onClose, onProcess }) => {
             <input
               type="text"
               placeholder="Address"
-              className="w-full border p-3 rounded text-base font-medium"
+              className="w-full border p-3 rounded font-medium"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
             />
             <input
               type="number"
               placeholder="Delivery Fee"
-              className="w-full border p-3 rounded text-base font-medium"
+              className="w-full border p-3 rounded text-lg font-medium"
               value={fee}
               onChange={(e) => setFee(e.target.value)}
               min="0"

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 import logo from "../assets/macky.png"; // Import logo
 
 const Login: React.FC = () => {
@@ -13,19 +14,24 @@ const Login: React.FC = () => {
 
     if (username === "admin" && password === "12345") {
       localStorage.setItem("isAuthenticated", "true");
-      Swal.fire({
-        icon: "success",
-        html: '<h2 class="text-2xl font-bold">Admin Login Successful!</h2>',
-        showConfirmButton: false,
-        timer: 1500,
-      }).then(() => {
-        navigate("/dashboard");
+
+      toast.success("Admin Login Successful!", {
+        position: "top-right",
+        autoClose: 1000,
+        style: {
+          fontWeight: 600,
+          fontSize: "16px",
+        },
+        onClose: () => navigate("/dashboard"),
       });
     } else {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid credentials",
-        text: "Please try again.",
+      toast.error("Invalid credentials. Please try again.", {
+        position: "top-right",
+        autoClose: 2500,
+        style: {
+          fontWeight: 500,
+          fontSize: "15px",
+        },
       });
     }
   };
@@ -38,7 +44,7 @@ const Login: React.FC = () => {
         {/* Login Form Container */}
         <div
           className="flex flex-wrap content-center justify-center bg-white"
-          style={{ width: "30rem", height: "40rem" }} // Adjust form width
+          style={{ width: "30rem", height: "40rem" }}
         >
           <div className="w-full flex flex-col items-center">
             <h1 className="text-3xl font-semibold mb-1">Welcome back</h1>
@@ -91,10 +97,10 @@ const Login: React.FC = () => {
         {/* Image Banner */}
         <div
           className="flex flex-wrap content-center justify-center bg-blue-100"
-          style={{ width: "36rem", height: "40rem" }} // Adjust image width
+          style={{ width: "36rem", height: "40rem" }}
         >
           <img
-            className="max-w-[8rem] max-h-[8rem] object-contain" // Even smaller logo
+            className="max-w-[8rem] max-h-[8rem] object-contain"
             src={logo}
             alt="Login Banner"
           />
