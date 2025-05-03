@@ -90,7 +90,6 @@ const Product_List: React.FC = () => {
         },
         pagination: { limit: 10 },
         search: true,
-        sort: true,
         data: [
           ["Plywood", "Marine", "¼ inch", "pc", 450, 0, "Out of Stock"],
           ["Plywood", "Marine", "½ inch", "pc", 780, 0, "Out of Stock"],

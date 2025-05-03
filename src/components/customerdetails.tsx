@@ -38,7 +38,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, closeModal, orderDetails }) => {
             <span className="text-base">{orderDetails[4]}</span>
           </p>
           <p className="text-base">
-            <strong>Status: &nbsp;</strong>
+            <strong>Method: &nbsp;</strong>
             <span className="text-base">{orderDetails[5]}</span>
           </p>
           <p className="text-base">

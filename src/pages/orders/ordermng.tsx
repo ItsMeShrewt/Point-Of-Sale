@@ -131,7 +131,6 @@ const Orders: React.FC = () => {
       },
       pagination: { limit: 7 },
       search: true,
-      sort: true,
       data: [
         ["Plywood", "Marine", "¼ inch", "pc", 450, 5],
         ["Plywood", "Marine", "½ inch", "pc", 780, 0],

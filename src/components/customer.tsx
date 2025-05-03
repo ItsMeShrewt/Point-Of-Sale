@@ -29,8 +29,8 @@ const Customer: React.FC = () => {
           { name: "Date", width: "100px" },
           { name: "Product Name", width: "150px" },
           { name: "Total Amount", width: "100px" },
-          { name: "Payment Method", width: "100px" },
-          { name: "Status", width: "100px" },
+          { name: "Payment Type", width: "100px" },
+          { name: "Method", width: "100px" },
           {
             name: "Action",
             width: "50px",
