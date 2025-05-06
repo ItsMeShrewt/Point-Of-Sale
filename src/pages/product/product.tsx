@@ -1,22 +1,33 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Grid, html } from "gridjs";
 import "gridjs/dist/theme/mermaid.css";
 import Breadcrumb from "../../components/breadcrums";
 import Header from "../../layouts/header";
 import Sidemenu from "../../layouts/sidemenu";
-
+import Loading from "../../components/loading"; // Reused Loading component
 
 const Product_List: React.FC = () => {
   const gridRef = useRef<HTMLDivElement>(null);
+  const [loading, setLoading] = useState(true); // Loading state
 
   useEffect(() => {
-    if (gridRef.current) {
+    // Simulate a short loading time
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
+  }, []);
+
+  useEffect(() => {
+    // Render the Grid only after loading is done
+    if (!loading && gridRef.current) {
       new Grid({
         columns: [
-          { name: "#", width: "35px",
+          {
+            name: "#",
+            width: "35px",
             formatter: (cell) =>
               html(`<span class="text-base text-center">${cell}</span>`),
-           },
+          },
           {
             name: "Category",
             width: "200px",
@@ -58,14 +69,14 @@ const Product_List: React.FC = () => {
             width: "100px",
             formatter: (cell) => {
               let bgClass = "";
-              let textClass = "text-white"; // default white text for contrast
-          
+              let textClass = "text-white";
+
               switch (cell) {
                 case "Available":
                   bgClass = "bg-green-500";
                   break;
                 case "Low Stock":
-                  bgClass = "bg-orange-500"; // better contrast with yellow
+                  bgClass = "bg-orange-500";
                   break;
                 case "Out of Stock":
                   bgClass = "bg-red-600";
@@ -73,7 +84,7 @@ const Product_List: React.FC = () => {
                 default:
                   bgClass = "bg-gray-400";
               }
-          
+
               return html(`
                 <div class="flex justify-center">
                   <span class="px-3 py-1 rounded-full text-base font-semibold ${bgClass} ${textClass}">
@@ -82,7 +93,7 @@ const Product_List: React.FC = () => {
                 </div>
               `);
             },
-          },   
+          },
         ],
         className: {
           th: "text-lg font-semibold",
@@ -110,27 +121,27 @@ const Product_List: React.FC = () => {
           ["Paint", "Popular", "Flatwall Enamel - White", "Gallon", 650, 1, "Low Stock"],
           ["Paint", "Domino", "Quick Drying Enamel - Aluminum", "Gallon", 650, 3, "Low Stock"],
           ["Paint", "A-plus", "Acrylic Roof Paint - Baguio Green", "Gallon", 650, 5, "Low Stock"],
-          ["Paint", "Triton", "Metal Primer - Red Oxide", "Gallon", 620, 8, "Low Stock"]
+          ["Paint", "Triton", "Metal Primer - Red Oxide", "Gallon", 620, 8, "Low Stock"],
         ].map((row, index) => [`${index + 1}.`, ...row]),
       }).render(gridRef.current);
     }
-  }, []);
-  
+  }, [loading]);
 
   return (
     <>
-        <Header />
-        <Sidemenu />
-        <div className="main-content app-content">
-          <div className="container-fluid">
-            <Breadcrumb
-                title="Manage Products"
-                links={[
-                  { text: " Dashboard", link: "inventory" },
-                ]}
-                active="Products"
-            />
+      <Header />
+      <Sidemenu />
+      <div className="main-content app-content">
+        <div className="container-fluid">
+          <Breadcrumb
+            title="Manage Products"
+            links={[{ text: " Dashboard", link: "inventory" }]}
+            active="Products"
+          />
 
+          <Loading loading={loading} />
+
+          {!loading && (
             <div className="grid grid-cols-12 gap-x-6">
               <div className="xxl:col-span-12 col-span-12">
                 <div className="box overflow-hidden main-content-card">
@@ -140,8 +151,9 @@ const Product_List: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
+      </div>
     </>
   );
 };

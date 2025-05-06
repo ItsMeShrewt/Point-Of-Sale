@@ -4,9 +4,9 @@ import "gridjs/dist/theme/mermaid.css";
 import Breadcrumb from "../../components/breadcrums";
 import Header from "../../layouts/header";
 import Sidemenu from "../../layouts/sidemenu";
-// import ItemButtons from "../../components/buttons.tsx";
 import { Link } from "react-router-dom";
 import OrderListAndCheckout from "../../components/ordercheckout.tsx";
+import Loading from "../../components/loading"; // ✅ Reuse loading component
 
 type Order = {
   name: string;
@@ -20,36 +20,45 @@ const Orders: React.FC = () => {
   const [deliveryFee, setDeliveryFee] = useState<number>(0);
   const [orders, setOrders] = useState<Order[]>([]);
   const [amountGiven, setAmountGiven] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true); // ✅ Add loading state
 
   useEffect(() => {
+    // ✅ Simulate loading effect
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (loading || !gridRef.current) return;
+
     const handleClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       const button = target.closest(".add-to-order") as HTMLElement;
       if (!button) return;
-  
+
       event.preventDefault();
-      event.stopPropagation(); // Prevent event propagation
-  
+      event.stopPropagation();
+
       const productName = button.getAttribute("data-name") || "";
       const productDescription = button.getAttribute("data-description") || "";
       const productPrice = parseFloat(button.getAttribute("data-price") || "0");
-  
+
       setOrders((prevOrders) => {
         const index = prevOrders.findIndex(
           (order) =>
             order.name === productName &&
             order.description === productDescription
         );
-  
+
         if (index !== -1) {
           const updatedOrders = [...prevOrders];
-          updatedOrders[index] = {
-            ...updatedOrders[index],
-            quantity: updatedOrders[index].quantity + 1,
-          };
+          updatedOrders[index].quantity += 1;
           return updatedOrders;
         }
-  
+
         return [
           ...prevOrders,
           {
@@ -62,44 +71,18 @@ const Orders: React.FC = () => {
       });
     };
 
-    if (!gridRef.current) return;
-
     const grid = new Grid({
       columns: [
-        { name: "#", width: "50px",
-          formatter: (cell) =>
-            html(`<span class="text-base">${cell}</span>`),
-         },
+        { name: "#", width: "50px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
         {
-          name: "Category",
-          width: "100px",
-          formatter: (_, row) =>
-            html(
-              `<div class="flex items-center gap-3">
-                <span class="text-base">${row.cells[1].data}</span>
-              </div>`
-            ),
+          name: "Category", width: "100px", formatter: (_, row) =>
+            html(`<div class="flex items-center gap-3"><span class="text-base">${row.cells[1].data}</span></div>`)
         },
-        { name: "Brand", width: "125px",
-          formatter: (cell) =>
-            html(`<span class="text-base">${cell}</span>`),
-         },
-        { name: "Description", width: "125px",
-          formatter: (cell) =>
-            html(`<span class="text-base">${cell}</span>`),
-         },
-        { name: "Unit", width: "70px",
-          formatter: (cell) =>
-            html(`<span class="text-base">${cell}</span>`),
-         },
-        { name: "Price", width: "70px",
-          formatter: (cell) =>
-            html(`<span class="text-base">${cell}</span>`),
-         },
-        { name: "Quantity", width: "100px",
-          formatter: (cell) =>
-            html(`<span class="text-base">${cell}</span>`),
-         },
+        { name: "Brand", width: "125px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
+        { name: "Description", width: "125px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
+        { name: "Unit", width: "70px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
+        { name: "Price", width: "70px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
+        { name: "Quantity", width: "100px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
         {
           name: "Action",
           width: "110px",
@@ -108,11 +91,10 @@ const Orders: React.FC = () => {
             const productDescription = row.cells[3].data;
             const productPrice = row.cells[5].data;
             const productQuantity = row.cells[6].data;
-
             const isDisabled = productQuantity === 0;
 
-            return html(
-              `<button
+            return html(`
+              <button
                 class="add-to-order bg-blue-500 text-white px-2 py-3 rounded-md text-s flex items-center ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}"
                 data-name="${productName}"
                 data-description="${productDescription}"
@@ -121,8 +103,8 @@ const Orders: React.FC = () => {
               >
                 <i class="ri-add-line mr-1"></i>
                 <span class="px-1">Add to Order</span>
-              </button>`
-            );
+              </button>
+            `);
           },
         },
       ],
@@ -157,15 +139,12 @@ const Orders: React.FC = () => {
     });
 
     grid.render(gridRef.current);
-    const container = gridRef.current;
-    if (!container) return;
-  
-    container.addEventListener("click", handleClick);
-  
+    gridRef.current.addEventListener("click", handleClick);
+
     return () => {
-      container.removeEventListener("click", handleClick);
+      gridRef.current?.removeEventListener("click", handleClick);
     };
-  }, []);
+  }, [loading]); // wait until loading is false
 
   return (
     <>
@@ -186,28 +165,29 @@ const Orders: React.FC = () => {
               </Link>
             }
           />
-          <div className="grid grid-cols-12 gap-x-6">
-            <div className="xxl:col-span-8 col-span-12">
-              <div className="box overflow-hidden main-content-card">
-                <div className="box-body p-5">
-                  {/*
-                    <ItemButtons />
-                    <hr className="mt-3 mb-4" />
-                  */}
-                  <div ref={gridRef}></div>
+
+          <Loading loading={loading} /> {/* ✅ Show loading spinner */}
+
+          {!loading && (
+            <div className="grid grid-cols-12 gap-x-6">
+              <div className="xxl:col-span-8 col-span-12">
+                <div className="box overflow-hidden main-content-card">
+                  <div className="box-body p-5">
+                    <div ref={gridRef}></div>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <OrderListAndCheckout
-              orders={orders}
-              setOrders={setOrders}
-              amountGiven={amountGiven}
-              setAmountGiven={setAmountGiven}
-              deliveryFee={deliveryFee}
-              setDeliveryFee={setDeliveryFee}
-            />
-          </div>
+              <OrderListAndCheckout
+                orders={orders}
+                setOrders={setOrders}
+                amountGiven={amountGiven}
+                setAmountGiven={setAmountGiven}
+                deliveryFee={deliveryFee}
+                setDeliveryFee={setDeliveryFee}
+              />
+            </div>
+          )}
         </div>
       </div>
     </>

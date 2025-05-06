@@ -12,46 +12,58 @@ const Reports: React.FC = () => {
     if (gridRef.current) {
       new Grid({
         columns: [
-          { name: "#", width: "10px" },
+          { name: "#", width: "10px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
           {
             name: "ID",
             width: "100px",
             formatter: (_, row) =>
               html(
-                `<div class="flex items-center gap-3">
+                `<div class="flex items-center gap-3 text-base">
                   <span>${row.cells[1].data}</span>
                 </div>`
               ),
           },
-          { name: "Date & Time", width: "150px" },
-          { name: "Type", width: "100px" },
-          { name: "Category", width: "100px" },
-          { name: "Product", width: "150px" },
-          { name: "Qty", width: "80px" },
-          { name: "Amount", width: "80px" },
-          { name: "Payment", width: "100px" },
-          { name: "Status", width: "100px" },
-          {
-            name: "Action",
-            width: "110px",
-            formatter: () =>
-              html(`
-                <div class="flex justify-center gap-2">
-                  <button class="bg-yellow-500 text-white px-2 py-1 rounded text-xs flex items-center">
-                    <i class="ri-pencil-line mr-1"></i>
-                    <span class="px-1">Edit</span>
-                  </button>
-                  <button class="bg-red-500 text-white px-2 py-1 rounded text-xs flex items-center">
-                    <i class="ri-delete-bin-line mr-1"></i>
-                    <span class="px-1">Delete</span>
-                  </button>
-                </div>
-              `),
-          },
+          { name: "Date & Time", width: "150px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
+          { name: "Type", width: "100px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
+          { name: "Category", width: "100px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
+          { name: "Product", width: "150px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
+          { name: "Qty", width: "80px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
+          { name: "Amount", width: "80px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
+          { name: "Payment", width: "100px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
+          { name: "Status", width: "100px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
         ],
+        className: {
+          th: 'text-base'
+        },
         pagination: { limit: 10 },
         search: true,
-        sort: true,
         data: [
           ...[
             [

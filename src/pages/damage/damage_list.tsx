@@ -4,8 +4,6 @@ import "gridjs/dist/theme/mermaid.css";
 import Breadcrumb from "../../components/breadcrums";
 import Header from "../../layouts/header";
 import Sidemenu from "../../layouts/sidemenu";
-
-import ProfileImage from "../../assets/avatar.png";
 import { Link } from 'react-router-dom';
 
 const Damage_List: React.FC = () => {
@@ -15,43 +13,48 @@ const Damage_List: React.FC = () => {
     if (gridRef.current) {
       new Grid({
         columns: [
-          { name: "#", width: "10px"},
-          {
-            name: "Damage ID",
-            width: "200px",
-            formatter: (_, row) =>
-              html(`
-                <div class="flex items-center gap-3">
-                <img src="${ProfileImage}"
-                alt="Avatar" class="w-8 h-8 rounded-full" />
-                <span>${row.cells[1].data}</span>
-                </div>
-                `)
+          { name: "#", width: "10px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
           },
-          { name: "Product Name", width: "150px" },
-          { name: "Quantity Damaged", width: "200px" },
-          { name: "Reason", width: "200px" },
-          { name: "Date", width: "200px" },
+          { name: "Damage ID", width: "200px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+          },
+          { name: "Product Name", width: "150px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
+          { name: "Quantity Damaged", width: "200px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
+          { name: "Reason", width: "200px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
+          { name: "Date", width: "200px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
           {
               name: "Action",
-              width: "110px",
+              width: "60px",
               formatter: () =>
                 html(`
                     <div class="flex justify-center gap-2">
-                      <button class="bg-yellow-500 text-white px-2 py-1 rounded text-xs flex items-center">
+                      <button class="bg-yellow-500 text-white px-2 py-1 rounded-md text-xs flex items-center">
                         <i class="ri-pencil-line mr-1"></i>
-                        <span class="px-1">Edit</span>
-                      </button>
-                      <button class="bg-red-500 text-white px-2 py-1 rounded text-xs flex items-center">
-                        <i class="ri-delete-bin-line mr-1"></i>
-                        <span class="px-1">Delete</span>
+                        <span class="px-1 text-base">Edit</span>
                       </button>
                   `)
           },
         ],
+        className: {
+          th: 'text-base'
+        },
         pagination: { limit: 10},
         search: true,
-        sort: true,
         data: [
 
             ...[

@@ -3,6 +3,7 @@ import Swal from "sweetalert2";
 import Breadcrumb from "../../components/breadcrums";
 import Header from "../../layouts/header";
 import Sidemenu from "../../layouts/sidemenu";
+import { Link } from 'react-router-dom';
 
 interface FormData {
   firstName: string;
@@ -104,6 +105,11 @@ function Damaged_Registration() {
             title="Damaged Product Registration"
             links={[{ text: "Damaged Product", link: "/damage" }]}
             active="Damaged Product"
+            buttons={
+              <Link to="/damages/damage_list" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2">
+                <i className="bi bi-arrow-left"></i> Back
+              </Link>
+            }
           />
           <div className="grid grid-cols-12 gap-x-6">
             <div className="xxl:col-span-12 col-span-12">
