@@ -1,12 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef} from "react";
 import { Grid, html } from "gridjs";
 import "gridjs/dist/theme/mermaid.css"; // Import Grid.js theme CSS
-import Modal from "./customerdetails"; // Import the modal component
+
 
 const Customer: React.FC = () => {
   const gridRef = useRef<HTMLDivElement>(null);
-  const [selectedRow, setSelectedRow] = useState<any>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   const rowData = [
     ['John Doe', 'March 18, 2025', 'Sand & Gravel', '₱2,600.00', 'COD', 'Delivery'],
@@ -20,62 +19,53 @@ const Customer: React.FC = () => {
     if (gridRef.current) {
       const grid = new Grid({
         columns: [
-          { name: "#", width: "10px" },
+          { name: "#", width: "10px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
           {
             name: "Customer Name",
             width: "80px",
-            formatter: (_, row) => html(`<span>${row.cells[1].data}</span>`),
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
           },
-          { name: "Date", width: "100px" },
-          { name: "Product Name", width: "150px" },
-          { name: "Total Amount", width: "100px" },
-          { name: "Payment Type", width: "100px" },
-          { name: "Method", width: "100px" },
-          {
-            name: "Action",
-            width: "50px",
-            formatter: (_, row) => {
-              // Attach custom index here (first cell contains index like "1.")
-              const index = parseInt(row.cells[0].data.toString()) - 1;
-              return html(`
-                <button class="action-btn bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs" data-index="${index}">
-                  <i class="ri-more-fill"></i>
-                </button>
-              `);
-            },
+          { name: "Date", width: "100px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
           },
+          { name: "Product Name", width: "150px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
+          { name: "Total Amount", width: "100px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
+          { name: "Payment Type", width: "100px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
+          { name: "Method", width: "100px",
+            formatter: (cell) =>
+              html(`<span class="text-base">${cell}</span>`)
+           },
         ],
+        className: {
+          th: 'text-lg'
+        },
         pagination: { limit: 10 },
-        sort: true,
         data: rowData.map((row, index) => [`${index + 1}.`, ...row]),
       });
-
       grid.render(gridRef.current);
-
-      setTimeout(() => {
-        const buttons = document.querySelectorAll(".action-btn");
-        buttons.forEach((btn) => {
-          btn.addEventListener("click", (e: any) => {
-            const index = parseInt(e.currentTarget.getAttribute("data-index"));
-            setSelectedRow(rowData[index]);
-            setIsModalOpen(true);
-          });
-        });
-      }, 100);
     }
   }, []);
-
-  const closeModal = () => setIsModalOpen(false);
 
   return (
     <div className="box main-content-card shadow-lg rounded-lg bg-white min-h-[400px]">
       <div className="box-body p-5">
-        <h2 className="font-bold text-lg mb-4">Order List</h2>
+        <h2 className="font-bold text-xl mb-4">Order List</h2>
         <div ref={gridRef}></div>
       </div>
-
-      {/* Modal */}
-      <Modal isOpen={isModalOpen} closeModal={closeModal} orderDetails={selectedRow} />
     </div>
   );
 };

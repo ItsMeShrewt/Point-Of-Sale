@@ -4,7 +4,6 @@ import Header from "../../layouts/header";
 import Sidemenu from "../../layouts/sidemenu";
 import EditModal from "../../components/editmodal";
 import AddModal from "../../components/addmodal";
-import ToastNotification from "../../components/archivenotification.tsx";
 import { toast } from "react-toastify";
 import useGrid from "../../utils/useGrid"; // Import the custom hook
 
@@ -134,9 +133,6 @@ const Inventory_List: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* Add the ToastNotification Component here */}
-      <ToastNotification />
     </>
   );
 };

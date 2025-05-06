@@ -12,7 +12,7 @@ function Header() {
   ];
 
   return (
-    <header className="app-header sticky" id="header">
+    <header className="app-header sticky " id="header">
       <div className="main-header-container container-fluid">
         <div className="header-content-left">
           {/* Add any content that was previously there */}

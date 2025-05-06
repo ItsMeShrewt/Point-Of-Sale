@@ -49,9 +49,9 @@ function Sidemenu() {
 
   return (
     <>
-      <aside className="app-sidebar bg-red-800 h-screen" id="sidebar">
-        <div className="main-sidebar-header">
-          <a href="/" className="header-logo"></a>
+      <aside className="app-sidebar h-screen" id="sidebar">
+        <div className="main-sidebar-header bg-red-800">
+          <a href="/" className="header-logo bg-red-800"></a>
         </div>
 
         <div className="main-sidebar bg-red-800 h-full" id="sidebar-scroll">

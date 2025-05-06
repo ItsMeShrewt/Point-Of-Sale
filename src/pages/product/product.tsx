@@ -65,8 +65,7 @@ const Product_List: React.FC = () => {
                   bgClass = "bg-green-500";
                   break;
                 case "Low Stock":
-                  bgClass = "bg-yellow-300 text-black"; // better contrast with yellow
-                  textClass = "";
+                  bgClass = "bg-orange-500"; // better contrast with yellow
                   break;
                 case "Out of Stock":
                   bgClass = "bg-red-600";

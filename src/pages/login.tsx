@@ -20,17 +20,17 @@ const Login: React.FC = () => {
         autoClose: 1000,
         style: {
           fontWeight: 600,
-          fontSize: "16px",
+          fontSize: "17px",
         },
         onClose: () => navigate("/dashboard"),
       });
     } else {
       toast.error("Invalid credentials. Please try again.", {
         position: "top-right",
-        autoClose: 2500,
+        autoClose: 1500,
         style: {
-          fontWeight: 500,
-          fontSize: "15px",
+          fontWeight: 600,
+          fontSize: "17px",
         },
       });
     }

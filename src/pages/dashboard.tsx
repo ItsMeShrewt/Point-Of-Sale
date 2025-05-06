@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Breadcrumb from "../components/breadcrums";
 import Header from "../layouts/header";
 import Sidemenu from "../layouts/sidemenu";

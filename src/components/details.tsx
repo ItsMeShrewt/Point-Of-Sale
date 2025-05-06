@@ -69,6 +69,7 @@ const Details: React.FC<DetailsProps> = ({ onClose, onProcess }) => {
 
         <select
           className="w-full border p-3 rounded text-lg font-medium"
+          style={{ fontSize: '24px'}}
           value={type}
           onChange={(e) => setType(e.target.value)}
           disabled={name.trim() === ""}

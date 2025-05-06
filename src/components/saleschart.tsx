@@ -59,8 +59,8 @@ const SalesChart: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full max-w-4xl rounded-lg bg-white shadow border p-6 overflow-visible">
-      {/* Header with Total Sales on the left and Filter Sales dropdown on the right */}
+    <div className="relative w-full max-w-4xl rounded-lg bg-white shadow border p-6 overflow-visible text-base">
+      {/* Header */}
       <div className="flex justify-between items-center mb-0">
         <div className="text-xl font-semibold">Total Sales</div>
 
@@ -68,7 +68,7 @@ const SalesChart: React.FC = () => {
         <div className="relative inline-block text-left">
           <button
             onClick={toggleDropdown}
-            className="inline-flex justify-center rounded-md border border-gray-300 px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex justify-center rounded-md border border-gray-300 px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50"
           >
             Filter Sales
             <svg
@@ -87,22 +87,22 @@ const SalesChart: React.FC = () => {
 
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
-              <div className="py-1 text-sm text-gray-700">
+              <div className="py-1 text-base text-gray-700">
                 <button
                   onClick={() => handleFilterClick("week")}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-base"
                 >
                   This Week
                 </button>
                 <button
                   onClick={() => handleFilterClick("month")}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-base"
                 >
                   This Month
                 </button>
                 <button
                   onClick={() => handleFilterClick("year")}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100 text-base"
                 >
                   This Year
                 </button>
@@ -112,16 +112,16 @@ const SalesChart: React.FC = () => {
         </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={263}>
+      <ResponsiveContainer width="100%" height={290}>
         <BarChart data={filteredData} margin={{ top: 40, right: 30, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
+          <XAxis dataKey="name" className="text-base" />
+          <YAxis className="text-base" />
+          <Tooltip contentStyle={{ fontSize: "1rem" }} />
           <Bar
             dataKey="sales"
             fill="#3B82F6"
-            radius={[8, 8, 0, 0]} // Rounded top corners
+            radius={[8, 8, 0, 0]}
             barSize={35}
           />
         </BarChart>
