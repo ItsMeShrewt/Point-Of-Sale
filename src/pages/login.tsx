@@ -15,12 +15,12 @@ const Login: React.FC = () => {
     if (username === "admin" && password === "12345") {
       localStorage.setItem("isAuthenticated", "true");
 
-      toast.success("Admin Login Successful!", {
+      toast.success("Login Successful!", {
         position: "top-right",
         autoClose: 1000,
         style: {
-          fontWeight: 600,
-          fontSize: "17px",
+          fontWeight: 400,
+          fontSize: "18px",
         },
         onClose: () => navigate("/dashboard"),
       });
@@ -29,8 +29,8 @@ const Login: React.FC = () => {
         position: "top-right",
         autoClose: 1500,
         style: {
-          fontWeight: 600,
-          fontSize: "17px",
+          fontWeight: 400,
+          fontSize: "18px",
         },
       });
     }

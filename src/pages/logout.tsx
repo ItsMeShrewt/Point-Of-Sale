@@ -10,8 +10,8 @@ const Logout = () => {
       position: "top-right",
       autoClose: 1500,
       style: {
-        fontWeight: 600,
-        fontSize: "15px",
+        fontWeight: 400,
+        fontSize: "18px",
       },
     });
 
