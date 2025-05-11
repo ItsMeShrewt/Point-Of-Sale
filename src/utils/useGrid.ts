@@ -16,7 +16,7 @@ const useGrid = ({ gridRef, inventory, openEditModal, setConfirmArchive }: UseGr
       const grid = new Grid({
         columns: [
           { name: "#", width: "35px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
-          { name: "Category", width: "150px", formatter: (_, row) => html(`<span class="text-base">${row.cells[1].data}</span>`) },
+          { name: "Product Name", width: "150px", formatter: (_, row) => html(`<span class="text-base">${row.cells[1].data}</span>`) },
           { name: "Brand", width: "150px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
           { name: "Description", width: "150px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
           { name: "Unit", width: "100px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },

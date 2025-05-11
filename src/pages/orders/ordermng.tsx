@@ -55,7 +55,10 @@ const Orders: React.FC = () => {
 
         if (index !== -1) {
           const updatedOrders = [...prevOrders];
-          updatedOrders[index].quantity += 1;
+          updatedOrders[index] = {
+            ...updatedOrders[index],
+            quantity: updatedOrders[index].quantity + 1,
+          };
           return updatedOrders;
         }
 

@@ -47,7 +47,7 @@ const OrderListAndCheckout: React.FC<Props> = ({
       >
         <div className="box-body p-5">
           <h5 className="mt-0 mb-0">
-            <b>Orders</b>
+            <span className="font-semibold text-3xl text-blue-600">ORDERS</span>
           </h5>
           <hr className="mt-2 mb-2" />
           <div
@@ -112,7 +112,7 @@ const OrderListAndCheckout: React.FC<Props> = ({
 
         <div className="p-5 border-t bg-gray-50 flex flex-col items-stretch gap-3">
           <div className="flex justify-between w-full items-center">
-            <span className="font-medium text-lg text-gray-600">
+            <span className="font-medium text-lg text-red-500">
               Subtotal:
             </span>
             <input
@@ -124,7 +124,7 @@ const OrderListAndCheckout: React.FC<Props> = ({
           </div>
 
           <div className="flex justify-between w-full items-center">
-            <span className="font-medium text-lg text-gray-600">
+            <span className="font-medium text-lg text-red-500">
               Total Amount:
             </span>
             <input
@@ -137,7 +137,7 @@ const OrderListAndCheckout: React.FC<Props> = ({
 
           <div className="flex justify-between w-full items-center">
             <div className="flex items-center gap-2">
-              <span className="font-medium text-lg text-gray-600">
+              <span className="font-medium text-lg text-blue-600">
                 Enter Amount:
               </span>
               <input
@@ -150,7 +150,7 @@ const OrderListAndCheckout: React.FC<Props> = ({
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="font-medium text-lg text-gray-600">
+              <span className="font-medium text-lg text-blue-600">
                 Change:
               </span>
               <input
