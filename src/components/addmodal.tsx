@@ -139,17 +139,17 @@ const AddModal: React.FC<AddModalProps> = ({ isOpen, onClose }) => {
                 />
               </div>
             </div>
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-center gap-2 mt-8">
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="px-4 py-2 bg-gray-300 rounded-md"
+                  className="px-4 py-2 bg-red-600 text-white rounded-md text-base"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md text-base"
                 >
                   Add Material
                 </button>

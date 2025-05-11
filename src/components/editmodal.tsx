@@ -139,17 +139,17 @@ const EditModal: React.FC<EditModalProps> = ({ isOpen, onClose, initialProductNa
               </div>
             </div>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-center gap-2 mt-8">
             <button
               type="button"
               onClick={handleCancel} // Show cancel toast only when clicking cancel
-              className="px-4 py-2 bg-gray-300 rounded-md"
+              className="px-4 py-2 bg-red-600 text-base text-white rounded-md"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md"
+              className="px-4 py-2 bg-blue-600 text-base text-white rounded-md"
             >
               Save
             </button>

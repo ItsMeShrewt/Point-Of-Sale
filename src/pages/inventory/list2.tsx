@@ -87,7 +87,7 @@ const Inventory_List: React.FC = () => {
             buttons={
               <button
                 onClick={openAddModal}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
               >
                 <i className="ri-add-line"></i> Add New Material
               </button>
