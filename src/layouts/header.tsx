@@ -1,5 +1,5 @@
-import { useState } from "react"; // Import `useState` from React
-import ProfileDropdown from "../components/headerdd.tsx"; // Import the ProfileDropdown component
+import { useState } from "react";
+import ProfileDropdown from "../components/headerdd.tsx";
 
 function Header() {
   const [showNotifications, setShowNotifications] = useState(false);

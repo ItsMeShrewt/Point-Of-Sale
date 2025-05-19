@@ -5,7 +5,7 @@ import Sidemenu from "../layouts/sidemenu";
 import SalesChart from "../components/saleschart.tsx";
 import Customer from "../components/customer.tsx";
 import DashboardStats from "../components/dashboardstats.tsx";
-import RecentTransactions from "../components/recent.tsx";
+import Stock from "../components/stock.tsx";
 import Loading from "../components/loading"; // Import the Loading component
 
 function Dashboard() {
@@ -38,7 +38,7 @@ function Dashboard() {
               {/* Middle: Sales Chart + Quick Actions + Low Stock */}
               <div className="grid grid-cols-12 gap-6">
                 <div className="col-span-12 xl:col-span-6">
-                  <RecentTransactions />
+                <Stock />
                 </div>
                 <div className="col-span-12 xl:col-span-6">
                   <SalesChart />

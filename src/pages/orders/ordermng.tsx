@@ -1,15 +1,17 @@
+// ordermng.tsx
 import React, { useEffect, useRef, useState } from "react";
 import { Grid, html } from "gridjs";
 import "gridjs/dist/theme/mermaid.css";
 import Breadcrumb from "../../components/breadcrums";
 import Header from "../../layouts/header";
 import Sidemenu from "../../layouts/sidemenu";
-import { Link } from "react-router-dom";
 import OrderListAndCheckout from "../../components/ordercheckout.tsx";
-import Loading from "../../components/loading"; // ✅ Reuse loading component
+import Loading from "../../components/loading";
+import { useInventory } from "../../hooks/useInventory"; // Import the hook
 
 type Order = {
-  name: string;
+  name: string;           // product name
+  brand?: string;         // brand (optional)
   description: string;
   unitPrice: number;
   quantity: number;
@@ -20,16 +22,7 @@ const Orders: React.FC = () => {
   const [deliveryFee, setDeliveryFee] = useState<number>(0);
   const [orders, setOrders] = useState<Order[]>([]);
   const [amountGiven, setAmountGiven] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true); // ✅ Add loading state
-
-  useEffect(() => {
-    // ✅ Simulate loading effect
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
+  const { inventory, loading } = useInventory(); // Use the hook
 
   useEffect(() => {
     if (loading || !gridRef.current) return;
@@ -43,6 +36,7 @@ const Orders: React.FC = () => {
       event.stopPropagation();
 
       const productName = button.getAttribute("data-name") || "";
+      const productBrand = button.getAttribute("data-brand") || "";
       const productDescription = button.getAttribute("data-description") || "";
       const productPrice = parseFloat(button.getAttribute("data-price") || "0");
 
@@ -66,6 +60,7 @@ const Orders: React.FC = () => {
           ...prevOrders,
           {
             name: productName,
+            brand: productBrand,
             description: productDescription,
             unitPrice: productPrice,
             quantity: 1,
@@ -78,7 +73,7 @@ const Orders: React.FC = () => {
       columns: [
         { name: "#", width: "50px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
         {
-          name: "Category", width: "100px", formatter: (_, row) =>
+          name: "Product Name", width: "150px", formatter: (_, row) =>
             html(`<div class="flex items-center gap-3"><span class="text-base">${row.cells[1].data}</span></div>`)
         },
         { name: "Brand", width: "125px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
@@ -88,9 +83,10 @@ const Orders: React.FC = () => {
         { name: "Quantity", width: "100px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
         {
           name: "Action",
-          width: "110px",
+          width: "80px",
           formatter: (_, row) => {
-            const productName = row.cells[2].data;
+            const productName = row.cells[1].data;       // product name (index 1)
+            const productBrand = row.cells[2].data;      // brand (index 2)
             const productDescription = row.cells[3].data;
             const productPrice = row.cells[5].data;
             const productQuantity = row.cells[6].data;
@@ -98,14 +94,15 @@ const Orders: React.FC = () => {
 
             return html(`
               <button
-                class="add-to-order bg-blue-500 text-white px-2 py-3 rounded-md text-s flex items-center ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}"
+                class="add-to-order bg-blue-500 text-white px-2 py-3 rounded-md text-base flex items-center ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}"
                 data-name="${productName}"
+                data-brand="${productBrand}"
                 data-description="${productDescription}"
                 data-price="${productPrice}"
-                ${isDisabled ? "disabled" : ""}
+                ${isDisabled ? 'disabled' : ''}
               >
-                <i class="ri-add-line mr-1"></i>
-                <span class="px-1">Add to Order</span>
+                <i class="bi bi-cart-fill mr-1"></i>
+                <span class="px-1">Add</span>
               </button>
             `);
           },
@@ -114,31 +111,17 @@ const Orders: React.FC = () => {
       className: {
         th: "text-lg font-semibold",
       },
-      pagination: { limit: 7 },
+      pagination: { limit: 9 },
       search: true,
-      data: [
-        ["Plywood", "Marine", "¼ inch", "pc", 450, 5],
-        ["Plywood", "Marine", "½ inch", "pc", 780, 0],
-        ["Plywood", "Ordinary", "½ inch", "pc", 580, 5],
-        ["Plywood", "China", "¾ inch", "pc", 980, 5],
-        ["Plywood", "Top Forest", "¾ inch", "pc", 1250, 0],
-        ["Rebar", "Nippon Steel", "8 inch", "pc", 100, 6],
-        ["Mild Steel Square Hollow Bar", "BM Steel", "1x1", "pc", 400, 4],
-        ["Steel Wire", "KEI Industries Ltd", "Per kg", "kg", 90, 0],
-        ["Sand", "Holcim", "Per Cubic", "Cubic", 800, 0],
-        ["Gravel", "CEMEX", "Per Cubic", "Cubic", 1100, 5],
-        ["Sealant", "Bostik", "Vulca Seal", "1L", 750, 20],
-        ["Sealant", "Wilcon", "Sure Seal", "50ml", 180, 11],
-        ["Adhesive", "Stikwel", "PVA Wood Glue", "250g", 260, 11],
-        ["Paint", "Welcoat", "Flatwall Enamel - White", "Gallon", 800, 20],
-        ["Paint", "Rain or Shine", "Latex - Pistachio", "Gallon", 650, 20],
-        ["Paint", "Boysen", "Flatwall Enamel - White", "Gallon", 860, 19],
-        ["Paint", "Dutch Boy", "Roof Paint - Terra Cotta", "Gallon", 650, 16],
-        ["Paint", "Popular", "Flatwall Enamel - White", "Gallon", 650, 1],
-        ["Paint", "Domino", "Quick Drying Enamel - Aluminum", "Gallon", 650, 3],
-        ["Paint", "A-plus", "Acrylic Roof Paint - Baguio Green", "Gallon", 650, 5],
-        ["Paint", "Triton", "Metal Primer - Red Oxide", "Gallon", 620, 8],
-      ].map((row, index) => [`${index + 1}.`, ...row]),
+      data: inventory.map((item, index) => [
+        `${index + 1}.`,
+        item.product_name || "-",
+        item.brand || "-",
+        item.description || "-",
+        item.unit || "-",
+        item.price || 0,
+        item.quantity || 0,
+      ]),
     });
 
     grid.render(gridRef.current);
@@ -147,7 +130,7 @@ const Orders: React.FC = () => {
     return () => {
       gridRef.current?.removeEventListener("click", handleClick);
     };
-  }, [loading]); // wait until loading is false
+  }, [loading, inventory]);
 
   return (
     <>
@@ -159,17 +142,9 @@ const Orders: React.FC = () => {
             title="Manage Orders"
             links={[{ text: " Dashboard", link: "/product-sales" }]}
             active="Sales Orders"
-            buttons={
-              <Link
-                to=""
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded flex items-center gap-2"
-              >
-                <i className="ri-add-line"></i> Pending Orders
-              </Link>
-            }
           />
 
-          <Loading loading={loading} /> {/* ✅ Show loading spinner */}
+          <Loading loading={loading} />
 
           {!loading && (
             <div className="grid grid-cols-12 gap-x-6">

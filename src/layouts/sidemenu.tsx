@@ -121,23 +121,31 @@ function Sidemenu() {
                     <li className={`slide ${isActive('/inventory') ? 'bg-red-700' : ''}`}>
                       <Link to="/inventory" className="side-menu__item">
                         <i className="w-6 h-4 side-menu__icon bi bi-building-fill" style={{ color: 'white' }}></i>
-                        <span className="side-menu__label" style={{ color: 'white' }}>Warehouse A</span>
+                        <span className="side-menu__label" style={{ color: 'white' }}>Warehouse Main</span>
                       </Link>
                     </li>
                     <li className={`slide ${isActive('/inventory/list2') ? 'bg-red-700' : ''}`}>
                       <Link to="/inventory/list2" className="side-menu__item">
                         <i className="w-6 h-4 side-menu__icon bi bi-building-fill" style={{ color: 'white' }}></i>
-                        <span className="side-menu__label" style={{ color: 'white' }}>Warehouse B</span>
+                        <span className="side-menu__label" style={{ color: 'white' }}>Warehouse Left</span>
                       </Link>
                     </li>
                     <li className={`slide ${isActive('/inventory/list3') ? 'bg-red-700' : ''}`}>
                       <Link to="/inventory/list3" className="side-menu__item">
                         <i className="w-6 h-4 side-menu__icon bi bi-building-fill" style={{ color: 'white' }}></i>
-                        <span className="side-menu__label" style={{ color: 'white' }}>Warehouse C</span>
+                        <span className="side-menu__label" style={{ color: 'white' }}>Warehouse Front</span>
                       </Link>
                     </li>
                   </ul>
                 )}
+              </li>  
+
+              {/* Damaged Products */}
+              <li className={`slide ${isActive('/customer/customerlist') ? 'bg-red-700' : ''}`}>
+                <Link to="/customer/customerlist" className="side-menu__item">
+                  <i className="w-6 h-4 side-menu__icon bi bi-people-fill" style={{ color: 'white' }}></i>
+                  <span className="side-menu__label" style={{ color: 'white' }}>Customer List</span>
+                </Link>
               </li>
 
               {/* Damaged Products */}
