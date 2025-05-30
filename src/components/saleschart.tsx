@@ -1,60 +1,48 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
-
-const weeklyData = [
-  { name: "Mon", sales: 4000 },
-  { name: "Tue", sales: 3000 },
-  { name: "Wed", sales: 5000 },
-  { name: "Thu", sales: 7000 },
-  { name: "Fri", sales: 6000 },
-  { name: "Sat", sales: 8000 },
-  { name: "Sun", sales: 7500 },
-];
-
-const monthlyData = [
-  { name: "Week 1", sales: 28000 },
-  { name: "Week 2", sales: 32000 },
-  { name: "Week 3", sales: 35000 },
-  { name: "Week 4", sales: 40000 },
-];
-
-const yearlyData = [
-  { name: "Jan", sales: 250000 },
-  { name: "Feb", sales: 320000 },
-  { name: "Mar", sales: 280000 },
-  { name: "Apr", sales: 400000 },
-  { name: "May", sales: 370000 },
-  { name: "Jun", sales: 420000 },
-  { name: "Jul", sales: 390000 },
-  { name: "Aug", sales: 410000 },
-  { name: "Sep", sales: 360000 },
-  { name: "Oct", sales: 450000 },
-  { name: "Nov", sales: 470000 },
-  { name: "Dec", sales: 500000 },
-];
 
 const SalesChart: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [filteredData, setFilteredData] = useState(weeklyData);
+  const [filteredData, setFilteredData] = useState<any[]>([]);
+  const [period, setPeriod] = useState<string>("week");
+
+  // Fetch sales data dynamically from the backend
+  useEffect(() => {
+    const fetchSalesData = async () => {
+      try {
+        const response = await fetch(`http://127.0.0.1/database/index.php/Order/getSalesByDate?period=${period}`);
+        const data = await response.json();
+
+        if (data.status) {
+          // Format the data for the chart
+          const formattedData = data.sales.map((item: any) => ({
+            name: new Date(item.date).toLocaleDateString("en-US", { weekday: "short" }), // Day name
+            sales: item.total_sales,
+          }));
+          setFilteredData(formattedData);
+        } else {
+          console.error("Failed to fetch sales data:", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching sales data:", error);
+      }
+    };
+
+    fetchSalesData();
+  }, [period]);
 
   const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
-  const handleFilterClick = (period: string) => {
-    if (period === "week") {
-      setFilteredData(weeklyData);
-    } else if (period === "month") {
-      setFilteredData(monthlyData);
-    } else if (period === "year") {
-      setFilteredData(yearlyData);
-    }
+  const handleFilterClick = (selectedPeriod: string) => {
+    setPeriod(selectedPeriod); // Update the period (week, month, year)
     setIsDropdownOpen(false);
   };
 

@@ -1,113 +1,85 @@
-import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
 import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 interface Customer {
-  cust_name: string;
-  address: string;
-  phone: string;
+  customer_name: string;
+  customer_address: string;
+  customer_phone: string;
 }
 
 interface DetailsProps {
   onClose: () => void;
-  onProcess: () => void;
+  onProcess: (
+    name: string,
+    address?: string,
+    phone?: string,
+    method?: string,
+    paymentType?: string,
+    deliveryFee?: number
+  ) => void;
+  subtotal: number; // 👈 Add this line
 }
 
-const Details: React.FC<DetailsProps> = ({ onClose, onProcess }) => {
+const Details: React.FC<DetailsProps> = ({ onClose, onProcess, subtotal }) => {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
-  const [fee, setFee] = useState("");
-  const [type, setType] = useState("");
-  const [payType, setPayType] = useState("");
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [method, setMethod] = useState<string>("");
+  const [paymentType, setPaymentType] = useState<string>("");
+  const [deliveryFee, setDeliveryFee] = useState<string>(""); // Start as empty string
+
+  // Automatically set delivery fee to 0 if subtotal >= 3000 and method is Delivery
+  useEffect(() => {
+    if (method === "Delivery" && subtotal >= 3000) {
+      setDeliveryFee("0");
+    }
+  }, [method, subtotal]);
 
   useEffect(() => {
+    // Fetch customer list for autofill
     axios
-      .get("http://127.0.0.1/database/index.php/Customer/read")
+      .get("http://127.0.0.1/database/index.php/Order/create")
       .then((res) => {
         if (res.data?.status && Array.isArray(res.data.data)) {
           setCustomers(res.data.data);
-        } else {
-          toast.error("Failed to load customers.");
         }
       })
-      .catch(() => toast.error("Failed to load customers."));
+      .catch(() => {});
   }, []);
 
   const isFormValid =
     name.trim() !== "" &&
-    type !== "" &&
-    (type === "Delivery" ? address.trim() !== "" && fee.trim() !== "" : true) &&
-    (payType === "Cash" || payType === "Cash on Delivery");
+    method !== "" &&
+    paymentType !== "" &&
+    (method === "Delivery"
+      ? address.trim() !== "" &&
+        phone.trim() !== "" &&
+        (deliveryFee === "" ? false : Number(deliveryFee) >= 0)
+      : true);
 
-  const handleProceed = async () => {
+  const handleProceed = () => {
     if (!isFormValid) {
-      toast.error(
-        "Please complete all required fields and select a valid payment type."
-      );
+      toast.error("Please complete all required fields.");
       return;
     }
 
-    const existingCustomer = customers.find(
-      (c) => c.cust_name.toLowerCase() === name.toLowerCase()
+    onProcess(
+      name,
+      method === "Delivery" ? address : undefined,
+      method === "Delivery" ? phone : undefined,
+      method,
+      paymentType,
+      method === "Delivery" ? Number(deliveryFee) : 0 // Convert to number
     );
-
-    if (!existingCustomer) {
-      try {
-        const response = await axios.post(
-          "http://127.0.0.1/database/index.php/Customer/create",
-          { cust_name: name, address, phone }
-        );
-        if (!response.data.status) {
-          toast.error(response.data.message);
-          return;
-        }
-      } catch {
-        toast.error("Failed to add new customer.");
-        return;
-      }
-    }
-
-    toast.success(
-      <div>
-        <div className="text-base font-semibold mb-1">
-          Transaction processed successfully!
-        </div>
-        <div className="text-base font-normal pl-4">
-          <p>Name: {name}</p>
-          <p>Type: {type}</p>
-          {type === "Delivery" && (
-            <>
-              <p>Address: {address}</p>
-              <p>Phone: {phone}</p>
-              <p>Delivery Fee: ₱{fee}</p>
-            </>
-          )}
-          <p>Payment Type: {payType}</p>
-        </div>
-      </div>,
-      {
-        position: "top-right",
-        autoClose: 3500,
-        style: {
-          fontWeight: 600,
-          fontSize: "17px",
-          width: "375px",
-          whiteSpace: "normal",
-        },
-      }
-    );
-
-    onProcess();
-    onClose();
 
     setName("");
     setAddress("");
     setPhone("");
-    setFee("");
-    setType("");
-    setPayType("");
+    setMethod("");
+    setPaymentType("");
+    setDeliveryFee("");
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,12 +87,12 @@ const Details: React.FC<DetailsProps> = ({ onClose, onProcess }) => {
     setName(inputName);
 
     const matchedCustomer = customers.find(
-      (c) => c.cust_name.toLowerCase() === inputName.toLowerCase()
+      (c) => c.customer_name.toLowerCase() === inputName.toLowerCase()
     );
 
     if (matchedCustomer) {
-      setAddress(matchedCustomer.address);
-      setPhone(matchedCustomer.phone);
+      setAddress(matchedCustomer.customer_address);
+      setPhone(matchedCustomer.customer_phone);
     } else {
       setAddress("");
       setPhone("");
@@ -134,6 +106,42 @@ const Details: React.FC<DetailsProps> = ({ onClose, onProcess }) => {
         <hr className="mb-2 h-1 bg-black border-0" />
 
         <div className="space-y-4">
+          {/* Method */}
+          <div>
+            <label className="block text-base font-medium mb-1" htmlFor="method">
+              Method
+            </label>
+            <select
+              id="method"
+              className="w-full border p-3 rounded text-lg font-medium"
+              value={method}
+              onChange={(e) => setMethod(e.target.value)}
+            >
+              <option value="">Select Method</option>
+              <option value="Pick-up">Pick-up</option>
+              <option value="Delivery">Delivery</option>
+            </select>
+          </div>
+
+          {/* Payment Type */}
+          <div>
+            <label className="block text-base font-medium mb-1" htmlFor="paymentType">
+              Payment Type
+            </label>
+            <select
+              id="paymentType"
+              className="w-full border p-3 rounded text-lg font-medium"
+              value={paymentType}
+              onChange={(e) => setPaymentType(e.target.value)}
+            >
+              <option value="">Select Payment Type</option>
+              <option value="Cash">Cash</option>
+              <option value="Cash on Delivery" disabled={method === "Pick-up"}>
+                Cash on Delivery
+              </option>
+            </select>
+          </div>
+
           {/* Customer Name */}
           <div>
             <label className="block text-base font-medium mb-1" htmlFor="customerName">
@@ -149,52 +157,13 @@ const Details: React.FC<DetailsProps> = ({ onClose, onProcess }) => {
             />
             <datalist id="customer-list">
               {customers.map((cust, index) => (
-                <option key={index} value={cust.cust_name} />
+                <option key={index} value={cust.customer_name} />
               ))}
             </datalist>
           </div>
 
-          {/* Method */}
-          <div>
-            <label className="block text-base font-medium mb-1" htmlFor="methodType">
-              Method
-            </label>
-            <select
-              id="methodType"
-              className="w-full border p-3 rounded text-lg font-medium"
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              disabled={name.trim() === ""}
-            >
-              <option value="">-- Select Type --</option>
-              <option value="Pick-up">Pick-up</option>
-              <option value="Delivery">Delivery</option>
-            </select>
-          </div>
-
-          {/* Payment Type */}
-          {type && (
-            <div>
-              <label className="block text-base font-medium mb-1" htmlFor="payType">
-                Payment Type
-              </label>
-              <select
-                id="payType"
-                className="w-full border p-3 rounded text-lg font-medium"
-                value={payType}
-                onChange={(e) => setPayType(e.target.value)}
-              >
-                <option value="">-- Select Payment Type --</option>
-                <option value="Cash">Cash</option>
-                <option value="Cash on Delivery" disabled={type === "Pick-up"}>
-                  Cash on Delivery
-                </option>
-              </select>
-            </div>
-          )}
-
-          {/* Delivery Fields */}
-          {type === "Delivery" && (
+          {/* Delivery Fields (only for Delivery) */}
+          {method === "Delivery" && (
             <>
               <div>
                 <label className="block text-base font-medium mb-1" htmlFor="address">
@@ -225,14 +194,18 @@ const Details: React.FC<DetailsProps> = ({ onClose, onProcess }) => {
               <div>
                 <label className="block text-base font-medium mb-1" htmlFor="deliveryFee">
                   Delivery Fee
+                  {method === "Delivery" && subtotal >= 3000 && (
+                    <span className="ml-2 text-green-600 font-semibold">(Free Delivery!)</span>
+                  )}
                 </label>
                 <input
                   id="deliveryFee"
                   type="number"
-                  className="w-full border p-3 rounded text-lg font-medium"
-                  value={fee}
-                  onChange={(e) => setFee(e.target.value)}
-                  min="0"
+                  min={0}
+                  className="w-full border p-3 rounded font-medium"
+                  value={deliveryFee}
+                  onChange={(e) => setDeliveryFee(e.target.value)}
+                  disabled={method === "Delivery" && subtotal >= 3000}
                 />
               </div>
             </>

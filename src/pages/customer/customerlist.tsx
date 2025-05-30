@@ -1,23 +1,27 @@
-import React, { useEffect, useRef } from "react";
+import axios from "axios";
 import { Grid, html } from "gridjs";
 import "gridjs/dist/theme/mermaid.css";
+import React, { useEffect, useRef } from "react";
 import Breadcrumb from "../../components/breadcrums";
 import Header from "../../layouts/header";
 import Sidemenu from "../../layouts/sidemenu";
-import { Link } from 'react-router-dom';
-import axios from "axios";
 
 const Customer_List: React.FC = () => {
   const gridRef = useRef<HTMLDivElement>(null);
 
+  // Add a state to trigger refresh
+  const [refresh, setRefresh] = React.useState(0);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1/database/index.php/Customer/read");
+        const response = await axios.get("http://127.0.0.1/database/index.php/Order/getCustomers");
         const result = response.data;
         console.log("Response:", result);
 
         if (result.status && gridRef.current) {
+          // Clear previous grid if any
+          gridRef.current.innerHTML = "";
           new Grid({
             columns: [
               { name: "#", width: "10px",
@@ -36,32 +40,15 @@ const Customer_List: React.FC = () => {
                 formatter: (cell) =>
                   html(`<span class="text-base">${cell}</span>`)
                },
-              {
-                name: "Action",
-                width: "75px",
-                formatter: () =>
-                  html(`
-                    <div class="flex justify-center gap-2">
-                      <button class="bg-yellow-500 text-white px-2 py-1 rounded-md text-base flex items-center">
-                        <i class="ri-pencil-line mr-1"></i>
-                        <span class="px-1">Edit</span>
-                      </button>
-                      <button class="bg-red-500 text-white px-2 py-1 rounded-md text-base flex items-center">
-                        <i class="ri-delete-bin-line mr-1"></i>
-                        <span class="px-1">Delete</span>
-                      </button>
-                    </div>
-                  `),
-              },
             ],
             className: { th: 'text-lg'},
             pagination: { limit: 10 },
             search: true,
             data: result.data.map((user: any, index: number) => [
               `${index + 1}.`,
-              user.cust_name,
-              user.address,
-              user.phone,
+              user.customer_name,
+              user.customer_address,
+              user.customer_phone,
             ]),
           }).render(gridRef.current);
         }
@@ -71,7 +58,7 @@ const Customer_List: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [refresh]); // Depend on refresh
 
   return (
     <>
@@ -85,12 +72,14 @@ const Customer_List: React.FC = () => {
               { text: " Dashboard", link: "/customer" },
             ]}
             active="Customers"
-            buttons={
-              <Link to="/customer/create" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-base flex items-center gap-2">
-                <i className="ri-add-line"></i> Add Customer
-              </Link>
-            }
           />
+
+          <button
+            className="btn btn-primary mb-4"
+            onClick={() => setRefresh((r) => r + 1)}
+          >
+            Refresh Customers
+          </button>
 
           <div className="grid grid-cols-12 gap-x-6">
             <div className="xxl:col-span-12 col-span-12">

@@ -1,8 +1,10 @@
+import axios from "axios";
 import React, { useState } from "react";
-import Details from "./transactionform.tsx";
 import { toast } from "react-toastify";
+import Details from "./transactionform.tsx";
 
 type Order = {
+  inventoryId: number;
   name: string;
   description: string;
   unitPrice: number;
@@ -14,11 +16,10 @@ type Props = {
   setOrders: React.Dispatch<React.SetStateAction<Order[]>>;
   amountGiven: number;
   setAmountGiven: React.Dispatch<React.SetStateAction<number>>;
-  deliveryFee: number;
-  setDeliveryFee: React.Dispatch<React.SetStateAction<number>>;
+  onOrderComplete: () => void;
+  refreshInventory: () => void;
 };
 
-// --- QuantityButton component moved inside this file ---
 interface QuantityButtonProps {
   quantity: number;
   onIncrement: () => void;
@@ -29,40 +30,49 @@ const QuantityButton: React.FC<QuantityButtonProps> = ({
   quantity,
   onIncrement,
   onDecrement,
-}) => {
-  return (
-    <div className="flex items-center gap-2">
-      <button
-        className="px-2 py-1 bg-red-700 text-white rounded-lg"
-        onClick={onDecrement}
-      >
-        -
-      </button>
-      <span className="px-4 py-1 border rounded-md">{quantity}</span>
-      <button
-        className="px-2 py-1 bg-blue-500 text-white rounded-lg"
-        onClick={onIncrement}
-      >
-        +
-      </button>
-    </div>
-  );
-};
-// --- end QuantityButton ---
+}) => (
+  <div className="flex items-center gap-2">
+    <button
+      className="px-2 py-1 bg-red-700 text-white rounded-lg"
+      onClick={onDecrement}
+    >
+      -
+    </button>
+    <span className="px-4 py-1 border rounded-md">{quantity}</span>
+    <button
+      className="px-2 py-1 bg-blue-500 text-white rounded-lg"
+      onClick={onIncrement}
+    >
+      +
+    </button>
+  </div>
+);
 
 const OrderListAndCheckout: React.FC<Props> = ({
   orders,
   setOrders,
   amountGiven,
   setAmountGiven,
-  deliveryFee,
-  setDeliveryFee,
+  onOrderComplete,
+  refreshInventory,
 }) => {
+  const [discount, setDiscount] = useState<number>(0);
+
   const subtotal = orders.reduce(
     (sum, order) => sum + order.unitPrice * order.quantity,
     0
   );
-  const totalAmount = subtotal + (isNaN(deliveryFee) ? 0 : deliveryFee);
+  const [transactionDetails, setTransactionDetails] = useState<{
+    method?: string;
+    paymentType?: string;
+    deliveryFee?: number;
+  }>({});
+
+  // These will be set by the Details modal
+  const totalAmount =
+    subtotal +
+    (transactionDetails.deliveryFee ? transactionDetails.deliveryFee : 0) -
+    discount;
   const change = Math.max(amountGiven - totalAmount, 0);
   const canProcess = amountGiven >= totalAmount && totalAmount > 0;
 
@@ -71,15 +81,107 @@ const OrderListAndCheckout: React.FC<Props> = ({
     setAmountGiven(value === "" ? 0 : parseFloat(value));
   };
 
+  const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setDiscount(value === "" ? 0 : parseFloat(value));
+  };
+
+  // This function will be called from Details modal
+  const handleProcessOrder = async (
+    name: string,
+    address?: string,
+    phone?: string,
+    method?: string,
+    paymentType?: string,
+    deliveryFee?: number
+  ) => {
+    setTransactionDetails({ method, paymentType, deliveryFee });
+
+    if (!method) {
+      toast.error(
+        "Please select a method (Pick-up or Delivery) before processing the order.",
+        {
+          position: "top-right",
+          className: "text-base font-semibold",
+        }
+      );
+      return;
+    }
+
+    // Calculate subtotal before discount and delivery
+    const subtotal = orders.reduce(
+      (sum, order) => sum + order.unitPrice * order.quantity,
+      0
+    );
+
+    // If subtotal is 3000 or more, delivery is free
+    const finalDeliveryFee = subtotal >= 3000 ? 0 : (deliveryFee || 0);
+
+    try {
+      for (const order of orders) {
+        const response = await axios.post(
+          "http://127.0.0.1/database/index.php/Order/create",
+          {
+            inventory_id: order.inventoryId,
+            quantity: order.quantity,
+            delivery_fee: finalDeliveryFee,
+            discount: discount,
+            payment_type: paymentType,
+            method: method,
+            customer_name: name,
+            customer_address: address || "",
+            customer_phone: phone || "",
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const result = response.data;
+
+        if (!result.status) {
+          toast.error(`Failed to process order for ${order.name}: ${result.message}`);
+          return;
+        }
+      }
+
+      toast.success("Orders processed successfully!", {
+        position: "top-right",
+        className: "text-base font-semibold",
+      });
+      setOrders([]);
+      setAmountGiven(0);
+      setDiscount(0);
+      setTransactionDetails({});
+      onOrderComplete();
+      refreshInventory();
+    } catch (error) {
+      console.error("Error processing orders:", error);
+      toast.error("Failed to process orders. Please try again.");
+    }
+  };
+
+  const handleCancelOrder = () => {
+    setOrders([]);
+    setAmountGiven(0);
+    setDiscount(0);
+    setTransactionDetails({});
+    toast.info("Transaction was cancelled.", {
+      position: "top-right",
+      autoClose: 2000,
+      style: { fontWeight: 600, fontSize: "17px" },
+    });
+  };
+
   interface TransactionButtonsProps {
-    onProcess: () => void;
     onCancel: () => void;
     hasOrder: boolean;
     canProcess: boolean;
   }
 
   const TransactionButtons: React.FC<TransactionButtonsProps> = ({
-    onProcess,
     onCancel,
     hasOrder,
     canProcess,
@@ -87,16 +189,6 @@ const OrderListAndCheckout: React.FC<Props> = ({
     const [showModal, setShowModal] = useState(false);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const disabledStyle = "opacity-50 cursor-not-allowed";
-
-    const handleConfirmCancel = () => {
-      onCancel();
-      toast.info("Transaction was cancelled.", {
-        position: "top-right",
-        autoClose: 2000,
-        style: { fontWeight: 600, fontSize: "17px" },
-      });
-      setShowCancelConfirm(false);
-    };
 
     return (
       <>
@@ -127,7 +219,11 @@ const OrderListAndCheckout: React.FC<Props> = ({
         </div>
 
         {showModal && (
-          <Details onClose={() => setShowModal(false)} onProcess={onProcess} />
+          <Details
+            onClose={() => setShowModal(false)}
+            onProcess={handleProcessOrder}
+            subtotal={subtotal}
+          />
         )}
 
         {showCancelConfirm && (
@@ -139,7 +235,7 @@ const OrderListAndCheckout: React.FC<Props> = ({
               <div className="flex justify-center gap-4">
                 <button
                   className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                  onClick={handleConfirmCancel}
+                  onClick={onCancel}
                 >
                   Yes
                 </button>
@@ -161,7 +257,7 @@ const OrderListAndCheckout: React.FC<Props> = ({
     <div className="xxl:col-span-4 col-span-12">
       <div
         className="box overflow-hidden main-content-card flex flex-col justify-between"
-        style={{ height: "815px" }}
+        style={{ height: "900px" }}
       >
         <div className="box-body p-5">
           <h5 className="mt-0 mb-0">
@@ -203,7 +299,7 @@ const OrderListAndCheckout: React.FC<Props> = ({
                             : o
                         )
                       )
-                    }                    
+                    }
                   />
                 </div>
                 <div className="flex flex-col items-end gap-2">
@@ -225,8 +321,9 @@ const OrderListAndCheckout: React.FC<Props> = ({
         </div>
 
         <div className="p-5 border-t bg-gray-50 flex flex-col items-stretch gap-3">
+          {/* Subtotal */}
           <div className="flex justify-between w-full items-center">
-            <span className="font-medium text-lg text-red-500">Subtotal:</span>
+            <span className="font-medium text-base text-black">Subtotal:</span>
             <input
               type="text"
               value={`₱${subtotal.toFixed(2)}`}
@@ -235,8 +332,21 @@ const OrderListAndCheckout: React.FC<Props> = ({
             />
           </div>
 
+          {/* Discount */}
           <div className="flex justify-between w-full items-center">
-            <span className="font-medium text-lg text-red-500">Total Amount:</span>
+            <span className="font-medium text-base text-black">Discount:</span>
+            <input
+              type="number"
+              value={discount === 0 ? "" : discount}
+              onChange={handleDiscountChange}
+              className="px-2 py-1 border rounded-md w-32"
+              disabled={orders.length === 0}
+            />
+          </div>
+
+          {/* Total Amount */}
+          <div className="flex justify-between w-full items-center">
+            <span className="font-medium text-base text-black">Total Amount:</span>
             <input
               type="text"
               value={`₱${totalAmount.toFixed(2)}`}
@@ -245,9 +355,10 @@ const OrderListAndCheckout: React.FC<Props> = ({
             />
           </div>
 
+          {/* Enter Amount and Change */}
           <div className="flex justify-between w-full items-center">
             <div className="flex items-center gap-2">
-              <span className="font-medium text-lg text-blue-600">Enter Amount:</span>
+              <span className="font-medium text-base text-black">Enter Amount:</span>
               <input
                 type="number"
                 value={amountGiven === 0 ? "" : amountGiven}
@@ -258,7 +369,7 @@ const OrderListAndCheckout: React.FC<Props> = ({
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="font-medium text-lg text-blue-600">Change:</span>
+              <span className="font-medium text-base text-black">Change:</span>
               <input
                 type="text"
                 value={`₱${change.toFixed(2)}`}
@@ -269,16 +380,7 @@ const OrderListAndCheckout: React.FC<Props> = ({
           </div>
 
           <TransactionButtons
-            onProcess={() => {
-              setOrders([]);
-              setAmountGiven(0);
-              setDeliveryFee(0);
-            }}
-            onCancel={() => {
-              setOrders([]);
-              setAmountGiven(0);
-              setDeliveryFee(0);
-            }}
+            onCancel={handleCancelOrder}
             hasOrder={orders.length > 0}
             canProcess={canProcess}
           />

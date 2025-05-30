@@ -140,13 +140,14 @@ function Sidemenu() {
                 )}
               </li>  
 
-              {/* Damaged Products */}
+              {/* Customer List */}
               <li className={`slide ${isActive('/customer/customerlist') ? 'bg-red-700' : ''}`}>
                 <Link to="/customer/customerlist" className="side-menu__item">
                   <i className="w-6 h-4 side-menu__icon bi bi-people-fill" style={{ color: 'white' }}></i>
                   <span className="side-menu__label" style={{ color: 'white' }}>Customer List</span>
                 </Link>
               </li>
+
 
               {/* Damaged Products */}
               <li className={`slide ${isActive('/damages/damage_list') ? 'bg-red-700' : ''}`}>

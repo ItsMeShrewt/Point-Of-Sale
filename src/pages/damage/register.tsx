@@ -1,36 +1,25 @@
-import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import axios from "axios";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { Link } from 'react-router-dom';
 import Swal from "sweetalert2";
 import Breadcrumb from "../../components/breadcrums";
 import Header from "../../layouts/header";
 import Sidemenu from "../../layouts/sidemenu";
-import { Link } from 'react-router-dom';
 
 interface FormData {
-  firstName: string;
-  lastName: string;
-  company: string;
-  email: string;
-  phone: string;
-  region: string;
-  province: string;
-  city: string;
-  barangay: string;
-  postalCode: string;
-  biography: string;
+  id: string; // Add ID field
+  productName: string;
+  section: string; // Add Section field
+  quantityDamaged: string;
+  reason: string;
 }
 
 const initialFormData: FormData = {
-  firstName: "",
-  lastName: "",
-  company: "",
-  email: "",
-  phone: "",
-  region: "",
-  province: "",
-  city: "",
-  barangay: "",
-  postalCode: "",
-  biography: "",
+  id: "", // Initialize ID
+  productName: "",
+  section: "", // Initialize Section
+  quantityDamaged: "",
+  reason: "",
 };
 
 function Damaged_Registration() {
@@ -38,6 +27,7 @@ function Damaged_Registration() {
 
   const [showResetAlert, setShowResetAlert] = useState(false);
   const [showSubmitAlert, setShowSubmitAlert] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (showResetAlert) {
@@ -77,22 +67,81 @@ function Damaged_Registration() {
     }
   }, [showSubmitAlert]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = async (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    // Automatically fetch product details when ID is entered
+    if (name === "id" && value) {
+      try {
+        const response = await axios.get(`http://127.0.0.1/database/index.php/Inventory/getProductById/${value}`);
+        if (response.status === 200) {
+          const product = response.data;
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            productName: product.product_name, // Automatically fill product name
+            section: product.section, // Automatically fill section
+          }));
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: "Product not found. Please check the ID.",
+            icon: "error",
+          });
+        }
+      } catch (error: any) {
+        Swal.fire({
+          title: "Error",
+          text: error.response?.data?.message || "An error occurred while fetching product details.",
+          icon: "error",
+        });
+      }
+    }
   };
 
   const handleResetConfirm = () => {
     setFormData(initialFormData);
   };
 
-  const handleSubmitConfirm = () => {
-    console.log("Form submitted", formData);
-    // Add submit logic here
+  const handleSubmitConfirm = async () => {
+    if (isSubmitting) return; // Prevent duplicate submissions
+    setIsSubmitting(true);
+
+    try {
+      console.log("Form submitted");
+      const response = await axios.post(`http://127.0.0.1/database/index.php/Damage/damage/${formData.id}`, {
+        reason: formData.reason,
+        quantity_damaged: parseInt(formData.quantityDamaged, 10),
+      });
+
+      if (response.status === 200 && response.data.status) {
+        Swal.fire({
+          title: "Success",
+          text: response.data.message || "Damaged product recorded successfully.",
+          icon: "success",
+        });
+        setFormData(initialFormData); // Reset form after successful submission
+      } else {
+        Swal.fire({
+          title: "Error",
+          text: response.data.message || "Failed to record damaged product.",
+          icon: "error",
+        });
+      }
+    } catch (error: any) {
+      Swal.fire({
+        title: "Error",
+        text: error.response?.data?.message || "An error occurred while submitting the form.",
+        icon: "error",
+      });
+    } finally {
+      setIsSubmitting(false); // Re-enable the button
+    }
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setShowSubmitAlert(true);
+    handleSubmitConfirm();
   };
 
   return (
@@ -116,46 +165,109 @@ function Damaged_Registration() {
               <div className="box overflow-hidden main-content-card">
                 <div className="box-body p-5">
                   <form onSubmit={handleSubmit}>
-
-                    {/* 👉 Added Form Inputs Here */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {[
-                        ["Product Name", "productName", "bi bi-box"],
-                        ["Category", "category", "bi bi-tags"],
-                        ["Price", "price", "bi bi-currency-dollar"],
-                        ["Quantity", "quantity", "bi bi-123"],
-                        ["Description", "description", "bi bi-card-text"],
-                        ["SKU", "sku", "bi bi-upc-scan"],
-                        ["Supplier", "supplier", "bi bi-truck"],
-                        ["Stock Status", "stockStatus", "bi bi-check-circle"],
-                      ].map(([label, name, icon]) => (
-                        <div key={name} className="relative">
-                          <label className="block font-medium mb-1" htmlFor={name as string}>
-                            {label}
-                          </label>
-                          <div className="relative">
-                            <input
-                              type={name === "email" ? "email" : "text"}
-                              id={name as string}
-                              name={name as string}
-                              value={(formData as any)[name as string]}
-                              onChange={handleChange}
-                              className="ti-form-input rounded-sm ps-11 focus:z-10"
-                              placeholder={`Enter ${label}`}
-                            />
-                            <i
-                              className={`absolute inset-y-0 start-0 flex items-center pointer-events-none z-20 ps-4 ${icon}`}
-                            ></i>
-                          </div>
+                      {/* ID */}
+                      <div className="relative">
+                        <label className="block font-medium mb-1" htmlFor="id">
+                          Product ID
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            id="id"
+                            name="id"
+                            value={formData.id}
+                            onChange={handleChange}
+                            className="ti-form-input rounded-sm ps-11 focus:z-10"
+                            placeholder="Enter Product ID"
+                          />
+                          <i className="absolute inset-y-0 start-0 flex items-center pointer-events-none z-20 ps-4 bi bi-upc-scan"></i>
                         </div>
-                      ))}
+                      </div>
+
+                      {/* Product Name */}
+                      <div className="relative">
+                        <label className="block font-medium mb-1" htmlFor="productName">
+                          Product Name
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            id="productName"
+                            name="productName"
+                            value={formData.productName}
+                            onChange={handleChange}
+                            className="ti-form-input rounded-sm ps-11 focus:z-10"
+                            placeholder="Enter Product Name"
+                            disabled // Make this field read-only
+                          />
+                          <i className="absolute inset-y-0 start-0 flex items-center pointer-events-none z-20 ps-4 bi bi-box"></i>
+                        </div>
+                      </div>
+
+                      {/* Section */}
+                      <div className="relative">
+                        <label className="block font-medium mb-1" htmlFor="section">
+                          Section
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            id="section"
+                            name="section"
+                            value={formData.section}
+                            onChange={handleChange}
+                            className="ti-form-input rounded-sm ps-11 focus:z-10"
+                            placeholder="Section"
+                            disabled // Make this field read-only
+                          />
+                          <i className="absolute inset-y-0 start-0 flex items-center pointer-events-none z-20 ps-4 bi bi-grid"></i>
+                        </div>
+                      </div>
+
+                      {/* Quantity Damaged */}
+                      <div className="relative">
+                        <label className="block font-medium mb-1" htmlFor="quantityDamaged">
+                          Quantity Damaged
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            id="quantityDamaged"
+                            name="quantityDamaged"
+                            value={formData.quantityDamaged}
+                            onChange={handleChange}
+                            className="ti-form-input rounded-sm ps-11 focus:z-10"
+                            placeholder="Enter Quantity Damaged"
+                          />
+                          <i className="absolute inset-y-0 start-0 flex items-center pointer-events-none z-20 ps-4 bi bi-123"></i>
+                        </div>
+                      </div>
+
+                      {/* Reason */}
+                      <div className="relative">
+                        <label className="block font-medium mb-1" htmlFor="reason">
+                          Reason
+                        </label>
+                        <div className="relative">
+                          <textarea
+                            id="reason"
+                            name="reason"
+                            value={formData.reason}
+                            onChange={handleChange}
+                            className="ti-form-input rounded-sm ps-11 focus:z-10"
+                            placeholder="Enter Reason for Damage"
+                          ></textarea>
+                          <i className="absolute inset-y-0 start-0 flex items-center pointer-events-none z-20 ps-4 bi bi-exclamation-circle"></i>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="mt-4 flex justify-end gap-4">
                       <button
                         type="button"
                         className="bg-gray-300 px-4 py-2 rounded"
-                        onClick={() => setShowResetAlert(true)}
+                        onClick={() => setFormData(initialFormData)}
                       >
                         Reset
                       </button>
@@ -167,7 +279,6 @@ function Damaged_Registration() {
                         <span className="px-3">Submit Record</span>
                       </button>
                     </div>
-                    
                   </form>
                 </div>
               </div>

@@ -1,11 +1,12 @@
-import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import axios from "axios";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import Select from "react-select";
+import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import Breadcrumb from "../../components/breadcrums";
 import Header from "../../layouts/header";
 import Sidemenu from "../../layouts/sidemenu";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { toast } from "react-toastify";
 
 interface FormData {
   productName: string;
@@ -33,6 +34,16 @@ function Addmaterial() {
   const [showSubmitAlert, setShowSubmitAlert] = useState(false);
 
   const navigate = useNavigate();
+
+  // Options for the unit dropdown
+  const unitOptions = [
+    { value: "Cubic", label: "Cubic" },
+    { value: "Kilogram", label: "Kilogram" },
+    { value: "Piece", label: "Piece" },
+    { value: "Liters", label: "Liters" },
+    { value: "4 Liters", label: "4 Liters" },
+    { value: "1/4 Liters", label: "1/4 Liters" },
+  ];
 
   useEffect(() => {
     if (showResetAlert) {
@@ -75,8 +86,40 @@ function Addmaterial() {
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    if ((name === "quantity" || name === "price") && value === "0") return;
-    setFormData({ ...formData, [name]: value });
+
+    // Handle unit-specific logic
+    if (name === "unit" && (value === "Cubic" || value === "Kilogram")) {
+      setFormData({
+        ...formData,
+        [name]: value,
+        quantity: "--" // Set quantity to "--" for Cubic or Kilogram
+      });
+    } else if (name === "unit") {
+      setFormData({
+        ...formData,
+        [name]: value,
+        quantity: "" // Reset quantity for other units
+      });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const handleUnitChange = (selectedOption: any) => {
+    const value = selectedOption?.value || "";
+    if (value === "Cubic" || value === "Kilogram") {
+      setFormData({
+        ...formData,
+        unit: value,
+        quantity: "--" // Set quantity to "--" for Cubic or Kilogram
+      });
+    } else {
+      setFormData({
+        ...formData,
+        unit: value,
+        quantity: "" // Reset quantity for other units
+      });
+    }
   };
 
   const handleSubmitConfirm = async () => {
@@ -95,7 +138,7 @@ function Addmaterial() {
       return;
     }
 
-    if (parseFloat(price) <= 0 || parseInt(quantity, 10) <= 0) {
+    if (parseFloat(price) <= 0 || (quantity !== "--" && parseInt(quantity, 10) <= 0)) {
       toast.error("Price and Quantity must be greater than 0.");
       return;
     }
@@ -107,7 +150,7 @@ function Addmaterial() {
       description: description.trim(),
       unit: unit.trim(),
       price: parseFloat(price),
-      quantity: parseInt(quantity, 10),
+      quantity: quantity === "--" ? null : parseInt(quantity, 10), // Handle "--" quantity
     };
 
     try {
@@ -176,9 +219,7 @@ function Addmaterial() {
                         ["Product Name", "productName", "bi bi-box", "text"],
                         ["Brand", "brand", "bi bi-bookmark", "text"],
                         ["Description", "description", "bi bi-card-text", "text"],
-                        ["Unit", "unit", "bi bi-rulers", "text"],
-                        ["Price", "price", "bi bi-currency-dollar", "number"],
-                        ["Quantity", "quantity", "bi bi-123", "number"],
+                        ["Quantity", "quantity", "bi bi-123", "text"], // Quantity as text to allow "--"
                       ].map(([label, name, icon, type]) => (
                         <div key={name} className="relative">
                           <label htmlFor={name} className="block font-medium mb-1 text-base">
@@ -194,39 +235,92 @@ function Addmaterial() {
                               onChange={handleChange}
                               className="ti-form-input rounded-sm ps-11 focus:z-10"
                               placeholder={`Enter ${label}`}
-                              required
+                              required={name !== "quantity" || formData.unit !== "Cubic" && formData.unit !== "Kilogram"}
+                              disabled={name === "quantity" && (formData.unit === "Cubic" || formData.unit === "Kilogram")}
                             />
                             <i className={`absolute inset-y-0 start-0 flex items-center ps-4 ${icon}`}></i>
                           </div>
                         </div>
                       ))}
-                    </div>
-
-                    <div className=" relative mt-4 flex justify-center">
-                    <div>
-                      <label htmlFor="section" className="block font-medium mb-1 text-base text-start">
-                        Warehouse
-                      </label>
+                      {/* Unit Dropdown */}
                       <div className="relative">
-                        <select
-                          id="section"
-                          name="section"
-                          value={formData.section}
-                          onChange={handleChange}
-                          className="ti-form-select rounded-sm ps-11"
-                          style={{ width: '400px'}}
-                          required
-                        >
-                          <option value="">Select Option</option>
-                          <option value="Main">Main</option>
-                          <option value="Left">Left</option>
-                          <option value="Front">Front</option>
-                        </select>
-                        <i className="bi bi-building absolute inset-y-0 start-0 flex items-center ps-4"></i>
+                        <label htmlFor="unit" className="block font-medium mb-1 text-base">
+                          Unit
+                        </label>
+                        <div className="relative">
+                          <Select
+                            id="unit"
+                            name="unit"
+                            options={unitOptions}
+                            value={unitOptions.find((option) => option.value === formData.unit)}
+                            onChange={handleUnitChange}
+                            isClearable
+                            className="react-select-container"
+                            classNamePrefix="react-select"
+                            menuPlacement="auto" // Automatically adjust dropdown placement
+                            styles={{
+                              control: (base) => ({
+                                ...base,
+                                paddingLeft: "1rem", // Adjust padding for better alignment
+                                paddingRight: "1rem",
+                              }),
+                              menu: (base) => ({
+                                ...base,
+                                maxHeight: "150px", // Limit the height of the dropdown menu
+                                overflowY: "auto", // Enable vertical scrolling
+                              }),
+                              menuList: (base) => ({
+                                ...base,
+                                maxHeight: "150px", // Ensure the menu list is scrollable
+                                overflowY: "auto",
+                              }),
+                            }}
+                          />
+                        </div>
+                      </div>
+                      {/* Price Input */}
+                      <div className="relative">
+                        <label htmlFor="price" className="block font-medium mb-1 text-base">
+                          Price
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            min="1"
+                            id="price"
+                            name="price"
+                            value={formData.price}
+                            onChange={handleChange}
+                            className="ti-form-input rounded-sm ps-11 focus:z-10"
+                            placeholder="Enter Price"
+                            required
+                          />
+                          <i className="bi bi-currency-dollar absolute inset-y-0 start-0 flex items-center ps-4"></i>
+                        </div>
+                      </div>
+                      {/* Warehouse Dropdown */}
+                      <div className="relative">
+                        <label htmlFor="section" className="block font-medium mb-1 text-base">
+                          Warehouse
+                        </label>
+                        <div className="relative">
+                          <select
+                            id="section"
+                            name="section"
+                            value={formData.section}
+                            onChange={handleChange}
+                            className="ti-form-select rounded-sm ps-11"
+                            required
+                          >
+                            <option value="">Select Warehouse</option>
+                            <option value="Main">Main</option>
+                            <option value="Left">Left</option>
+                            <option value="Front">Front</option>
+                          </select>
+                          <i className="bi bi-building absolute inset-y-0 start-0 flex items-center ps-4"></i>
+                        </div>
                       </div>
                     </div>
-                  </div>
-
 
                     <div className="mt-4 flex justify-end gap-4">
                       <button

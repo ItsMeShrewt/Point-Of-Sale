@@ -1,17 +1,17 @@
-// ordermng.tsx
-import React, { useEffect, useRef, useState } from "react";
 import { Grid, html } from "gridjs";
 import "gridjs/dist/theme/mermaid.css";
+import React, { useEffect, useRef, useState } from "react";
 import Breadcrumb from "../../components/breadcrums";
+import Loading from "../../components/loading";
+import OrderListAndCheckout from "../../components/ordercheckout.tsx";
+import { useInventory } from "../../hooks/useInventory"; // Import the hook
 import Header from "../../layouts/header";
 import Sidemenu from "../../layouts/sidemenu";
-import OrderListAndCheckout from "../../components/ordercheckout.tsx";
-import Loading from "../../components/loading";
-import { useInventory } from "../../hooks/useInventory"; // Import the hook
 
 type Order = {
-  name: string;           // product name
-  brand?: string;         // brand (optional)
+  inventoryId: number; // Added inventoryId to match backend and OrderListAndCheckout
+  name: string;        // Product name
+  brand?: string;      // Brand (optional)
   description: string;
   unitPrice: number;
   quantity: number;
@@ -19,10 +19,9 @@ type Order = {
 
 const Orders: React.FC = () => {
   const gridRef = useRef<HTMLDivElement>(null);
-  const [deliveryFee, setDeliveryFee] = useState<number>(0);
   const [orders, setOrders] = useState<Order[]>([]);
   const [amountGiven, setAmountGiven] = useState<number>(0);
-  const { inventory, loading } = useInventory(); // Use the hook
+  const { inventory, loading, refreshInventory } = useInventory(); // Use the hook with refresh functionality
 
   useEffect(() => {
     if (loading || !gridRef.current) return;
@@ -30,11 +29,16 @@ const Orders: React.FC = () => {
     const handleClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       const button = target.closest(".add-to-order") as HTMLElement;
-      if (!button) return;
+
+      // Check if the button exists and is not disabled
+      if (!button || button.hasAttribute("disabled")) {
+        return; // Ignore clicks on disabled buttons
+      }
 
       event.preventDefault();
       event.stopPropagation();
 
+      const inventoryId = parseInt(button.getAttribute("data-id") || "0", 10);
       const productName = button.getAttribute("data-name") || "";
       const productBrand = button.getAttribute("data-brand") || "";
       const productDescription = button.getAttribute("data-description") || "";
@@ -43,7 +47,9 @@ const Orders: React.FC = () => {
       setOrders((prevOrders) => {
         const index = prevOrders.findIndex(
           (order) =>
+            order.inventoryId === inventoryId && // Match by inventoryId
             order.name === productName &&
+            order.brand === productBrand &&
             order.description === productDescription
         );
 
@@ -59,6 +65,7 @@ const Orders: React.FC = () => {
         return [
           ...prevOrders,
           {
+            inventoryId,
             name: productName,
             brand: productBrand,
             description: productDescription,
@@ -85,21 +92,26 @@ const Orders: React.FC = () => {
           name: "Action",
           width: "80px",
           formatter: (_, row) => {
-            const productName = row.cells[1].data;       // product name (index 1)
-            const productBrand = row.cells[2].data;      // brand (index 2)
+            const inventoryId = row.cells[0].data; // Assuming inventoryId is in the first column
+            const productName = row.cells[1].data;
+            const productBrand = row.cells[2].data;
             const productDescription = row.cells[3].data;
             const productPrice = row.cells[5].data;
             const productQuantity = row.cells[6].data;
-            const isDisabled = productQuantity === 0;
+            const productUnit = row.cells[4].data; // Unit is in the 5th column
+
+            // Enable the button if the unit is "Cubic" or "Kilogram" OR if the quantity is greater than 0
+            const isDisabled = !(productUnit === "Cubic" || productUnit === "Kilogram") && Number(productQuantity) === 0;
 
             return html(`
               <button
-                class="add-to-order bg-blue-500 text-white px-2 py-3 rounded-md text-base flex items-center ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}"
+                class="add-to-order bg-blue-500 text-white px-2 py-3 rounded-md text-base flex items-center ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}"
+                data-id="${inventoryId}"
                 data-name="${productName}"
                 data-brand="${productBrand}"
                 data-description="${productDescription}"
                 data-price="${productPrice}"
-                ${isDisabled ? 'disabled' : ''}
+                ${isDisabled ? "disabled" : ""}
               >
                 <i class="bi bi-cart-fill mr-1"></i>
                 <span class="px-1">Add</span>
@@ -114,7 +126,7 @@ const Orders: React.FC = () => {
       pagination: { limit: 9 },
       search: true,
       data: inventory.map((item, index) => [
-        `${index + 1}.`,
+        item.id || index + 1, // Assuming `id` is the inventoryId
         item.product_name || "-",
         item.brand || "-",
         item.description || "-",
@@ -131,6 +143,12 @@ const Orders: React.FC = () => {
       gridRef.current?.removeEventListener("click", handleClick);
     };
   }, [loading, inventory]);
+
+  // Callback to handle order completion
+  const handleOrderComplete = () => {
+    setOrders([]); // Clear the orders
+    refreshInventory(); // Refresh the inventory
+  };
 
   return (
     <>
@@ -161,8 +179,8 @@ const Orders: React.FC = () => {
                 setOrders={setOrders}
                 amountGiven={amountGiven}
                 setAmountGiven={setAmountGiven}
-                deliveryFee={deliveryFee}
-                setDeliveryFee={setDeliveryFee}
+                onOrderComplete={handleOrderComplete} // Pass the callback
+                refreshInventory={refreshInventory} // Pass refreshInventory here
               />
             </div>
           )}

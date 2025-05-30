@@ -1,96 +1,88 @@
-import React, { useEffect, useRef } from "react";
+import axios from "axios";
 import { Grid, html } from "gridjs";
 import "gridjs/dist/theme/mermaid.css";
+import React, { useEffect, useRef, useState } from "react";
 import Breadcrumb from "../../components/breadcrums";
 import Header from "../../layouts/header";
 import Sidemenu from "../../layouts/sidemenu";
 
-
 const Order_History: React.FC = () => {
   const gridRef = useRef<HTMLDivElement>(null);
+  const [orderData, setOrderData] = useState<any[]>([]);
 
-  useEffect (() => {
-    if (gridRef.current) {
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await axios.get("http://127.0.0.1/database/index.php/Order/read");
+        const result = response.data;
+
+        if (result.status && Array.isArray(result.data)) {
+          const formattedData = result.data.map((order: any, index: number) => [
+            `${index + 1}.`, // Row number
+            order.id, // Order ID
+            order.order_date, // Order Date & Time
+            order.product_name, // Product Name
+            `₱${parseFloat(order.total_amount).toFixed(2)}`, // Total Amount
+            order.payment_type, // Payment Type
+            order.method, // Method
+            order.status || (order.is_returned === 1 ? "Returned" : "Complete"), // Status
+          ]);
+          setOrderData(formattedData);
+        } else {
+          console.error("No orders found:", result.message);
+        }
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    };
+    fetchOrders();
+  }, []);
+
+  useEffect(() => {
+    if (gridRef.current && orderData.length > 0) {
+      gridRef.current.innerHTML = ""; // Clear previous grid to prevent duplicates
+
       new Grid({
         columns: [
-          { name: "#", width: "10px",
-            formatter: (cell) =>
-              html(`<span class="text-base">${cell}</span>`)
-          },
-          {
-            name: "Order ID",
-            width: "80px",
-            formatter: (_, row) =>
-              html(`
-                <div class="flex items-center gap-3 text-base">
-                <span>${row.cells[1].data}</span>
-                </div>
-                `)
-          },
-          { name: "Date & Time", width: "100px",
-            formatter: (cell) =>
-              html(`<span class="text-base">${cell}</span>`)
-           },
-          { name: "Category", width: "150px",
-            formatter: (cell) =>
-              html(`<span class="text-base">${cell}</span>`)
-           },
-          { name: "Total Amount", width: "100px",
-            formatter: (cell) =>
-              html(`<span class="text-base">${cell}</span>`)
-           },
-          { name: "Payment Method", width: "100px",
-            formatter: (cell) =>
-              html(`<span class="text-base">${cell}</span>`)
-           },
-          { name: "Status", width: "100px",
-            formatter: (cell) =>
-              html(`<span class="text-base">${cell}</span>`)
-           },
+          { name: "#", width: "40px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
+          { name: "Order ID", width: "100px", formatter: (_, row) => html(`<div class="text-base">${row.cells[1].data}</div>`) },
+          { name: "Date & Time", width: "180px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
+          { name: "Product Name", width: "200px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
+          { name: "Total Amount", width: "120px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
+          { name: "Payment Type", width: "120px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
+          { name: "Method", width: "120px", formatter: (cell) => html(`<span class="text-base">${cell}</span>`) },
         ],
         className: {
-          th: 'text-base'
+          th: "text-lg",
+          td: "text-base",
         },
-        pagination: { limit: 10},
+        pagination: { limit: 10 },
         search: true,
-        data: [
-            ...[
-              ['ORD-1001', '2025-03-18 14:25', 'Sand & Gravel', 2600, 'COD', 'Completed'],
-              ['ORD-1002', '2025-03-19 10:45', 'Plywood', 6750, 'Cash', 'Completed'],
-              ['ORD-1003', '2025-03-20 09:15', 'Cement', 3850, 'Cash', 'Pending'],
-              ['ORD-1004', '2025-03-21 16:00', 'Hollow Blocks', 1500, 'COD', 'Completed'],
-              ['ORD-1005', '2025-03-22 11:30', 'Steel Bars', 4800, 'Cash', 'Cancelled']
-            ].map((row, index) => [(index + 1) + ".", ...row]),
-        ],
+        data: orderData,
       }).render(gridRef.current);
     }
-  }, []);
+  }, [orderData]);
 
   return (
     <>
-        <Header />
-        <Sidemenu />
-        <div className="main-content app-content">
-          <div className="container-fluid">
-            <Breadcrumb
-                title="Order History"
-                links={[
-                  { text: " Dashboard", link: "inventory" },
-                ]}
-                active="Order History"
-            />
-
-            <div className="grid grid-cols-12 gap-x-6">
-              <div className="xxl:col-span-12 col-span-12">
-                <div className="box overflow-hidden main-content-card">
-                  <div className="box-body p-5">
-                    <div ref={gridRef}></div>
-                  </div>
-                </div>
+      <Header />
+      <Sidemenu />
+      <div className="main-content app-content">
+        <div className="container-fluid">
+          <Breadcrumb
+            title="Order History"
+            links={[{ text: "Dashboard", link: "inventory" }]}
+            active="Order History"
+          />
+          <div className="grid grid-cols-12 gap-x-6">
+            <div className="xxl:col-span-12 col-span-12">
+              <div className="box overflow-hidden main-content-card shadow-md p-4">
+                <div ref={gridRef}></div>
               </div>
             </div>
           </div>
         </div>
+      </div>
     </>
   );
 };

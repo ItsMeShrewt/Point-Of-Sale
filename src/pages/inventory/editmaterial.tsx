@@ -1,11 +1,11 @@
-import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import axios from "axios";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import Breadcrumb from "../../components/breadcrums";
 import Header from "../../layouts/header";
 import Sidemenu from "../../layouts/sidemenu";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
-import { toast } from "react-toastify";
 
 interface FormData {
   productName: string;
@@ -37,9 +37,9 @@ function Editmaterial() {
   useEffect(() => {
     if (id) {
       axios
-        .get(`http://127.0.0.1/database/index.php/Inventory/read/${id}`)
+        .get(`http://127.0.0.1/database/index.php/Inventory/readById/${id}`)
         .then((response) => {
-          // Adjust based on your API response structure
+          console.log("API Response:", response.data); // Debugging log
           const material = response.data.data;
           if (material) {
             setFormData({
@@ -51,6 +51,8 @@ function Editmaterial() {
               quantity: material.quantity?.toString() || "",
               section: material.section || "",
             });
+          } else {
+            toast.error(response.data.message || "Material not found.");
           }
         })
         .catch((err) => {
@@ -224,6 +226,7 @@ function Editmaterial() {
                               className="ti-form-input rounded-sm ps-11 focus:z-10"
                               placeholder={`Enter ${label}`}
                               required
+                              readOnly={["productName", "brand", "description", "unit"].includes(name)} // Make specific fields read-only
                             />
                             <i className={`absolute inset-y-0 start-0 flex items-center ps-4 ${icon}`}></i>
                           </div>
@@ -243,6 +246,7 @@ function Editmaterial() {
                           onChange={handleChange}
                           className="ti-form-select rounded-sm ps-11 w-full"
                           required
+                          disabled // Disable the Warehouse dropdown to make it read-only
                         >
                           <option value="">Select Option</option>
                           <option value="Main">Main</option>

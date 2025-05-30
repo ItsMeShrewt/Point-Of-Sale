@@ -79,14 +79,14 @@ const Inventory_List: React.FC = () => {
             
             {
               name: "Action",
-              width: "150px",
+              width: "170px",
               formatter: (_, row) => {
                 const id = row.cells[9].data;
                 return html(`
                   <div class="flex justify-center gap-2">
                     <button class="edit-btn bg-yellow-500 text-white px-2 py-1 rounded-md text-base flex items-center" data-id="${id}">
                       <i class="ri-pencil-line mr-1"></i>
-                      <span>&nbsp;  Edit</span>
+                      <span>&nbsp;  Update</span>
                     </button>
                     <button class="archive-btn bg-red-500 text-white px-2 py-1 rounded-md text-base flex items-center" data-id="${id}">
                       <i class="ri-archive-line mr-1"></i>
